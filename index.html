@@ -1,0 +1,3924 @@
+<!doctype html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>DCE-ANIME // Cyber-Windows 95</title>
+        <style>
+            /* VARIABLES Y COLORES RETRO NEON */
+            :root {
+                --bg-dark: #0a0516;
+                --bg-desktop: #110826;
+                --win-bg: #1a0f30;
+                --win-border-light: #00f0ff;
+                --win-border-dark: #ff007f;
+                --neon-pink: #ff007f;
+                --neon-cyan: #00f0ff;
+                --neon-purple: #8b00ff;
+                --neon-green: #39ff14;
+                --text-color: #ffffff;
+                --text-muted: #a093c4;
+                --font-retro: "Courier New", Lucida Console, monospace;
+                --border-style: 3px double var(--neon-cyan);
+                --box-shadow-style:
+                    0 0 15px rgba(0, 240, 255, 0.3),
+                    inset 0 0 10px rgba(255, 0, 127, 0.2);
+                --titlebar-gradient: linear-gradient(
+                    90deg,
+                    var(--neon-pink),
+                    var(--neon-purple)
+                );
+            }
+
+            /* MODO OSCURO TERMINAL (CONTORNOS BLANCOS) */
+            body.theme-terminal {
+                --bg-dark: #000000;
+                --bg-desktop: #000000;
+                --win-bg: #000000;
+                --win-border-light: #ffffff;
+                --win-border-dark: #ffffff;
+                --neon-pink: #ffffff;
+                --neon-cyan: #ffffff;
+                --neon-purple: #555555;
+                --neon-green: #ffffff;
+                --text-color: #ffffff;
+                --text-muted: #888888;
+                --border-style: 2px solid #ffffff;
+                --box-shadow-style: none;
+                --titlebar-gradient: #333333;
+            }
+
+            body.theme-terminal .window {
+                box-shadow: none;
+            }
+
+            body.theme-terminal .btn-95 {
+                box-shadow: 2px 2px 0px #ffffff;
+            }
+
+            body.theme-terminal .start-btn {
+                background: #000;
+                border-color: #fff;
+            }
+
+            /* GENERAL STYLES */
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+                font-family: var(--font-retro);
+                image-rendering: pixelated;
+            }
+
+            body,
+            html {
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
+                background-color: var(--bg-dark);
+                color: var(--text-color);
+                user-select: none;
+            }
+
+            /* NEON GRID BACKGROUND */
+            .desktop-bg {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: calc(100% - 40px);
+                background-color: var(--bg-desktop);
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+                z-index: 1;
+                overflow: hidden;
+            }
+
+            /* CRT SCANLINES EFFECT */
+            .desktop-bg::after {
+                content: " ";
+                display: block;
+                position: absolute;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                right: 0;
+                background:
+                    linear-gradient(
+                        rgba(18, 16, 16, 0) 50%,
+                        rgba(0, 0, 0, 0.2) 50%
+                    ),
+                    linear-gradient(
+                        90deg,
+                        rgba(255, 0, 0, 0.03),
+                        rgba(0, 255, 0, 0.01),
+                        rgba(0, 0, 255, 0.03)
+                    );
+                background-size:
+                    100% 3px,
+                    3px 100%;
+                z-index: 9999;
+                pointer-events: none;
+            }
+
+            /* RETRO GLOWING TEXT */
+            .neon-text-pink {
+                color: var(--neon-pink);
+                text-shadow: 0 0 5px var(--neon-pink);
+            }
+            .neon-text-cyan {
+                color: var(--neon-cyan);
+                text-shadow: 0 0 5px var(--neon-cyan);
+            }
+            .neon-text-green {
+                color: var(--neon-green);
+            }
+
+            /* DESKTOP ICONS */
+            .desktop-icons {
+                position: absolute;
+                top: 20px;
+                left: 20px;
+                display: flex;
+                flex-direction: column;
+                gap: 25px;
+                z-index: 10;
+            }
+
+            .desktop-icon {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                width: 80px;
+                cursor: pointer;
+                text-align: center;
+                transition: transform 0.1s ease;
+                position: relative;
+            }
+
+            .desktop-icon:hover {
+                transform: scale(1.05);
+            }
+
+            .desktop-icon svg {
+                width: 48px;
+                height: 48px;
+                filter: drop-shadow(0 0 5px var(--neon-cyan));
+                margin-bottom: 8px;
+            }
+
+            .desktop-icon-label {
+                font-size: 11px;
+                font-weight: bold;
+                text-shadow:
+                    0 0 3px #000,
+                    1px 1px 2px #000;
+                color: #fff;
+                word-wrap: break-word;
+                width: 100%;
+            }
+
+            /* BADGE PARA NOTIFICACIONES */
+            .notification-badge {
+                position: absolute;
+                top: -2px;
+                right: 10px;
+                background: var(--neon-pink);
+                color: #fff;
+                font-size: 9px;
+                font-weight: bold;
+                border: 1px solid var(--neon-cyan);
+                border-radius: 50%;
+                width: 18px;
+                height: 18px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 0 5px var(--neon-pink);
+            }
+
+            /* WINDOW SYSTEM (WINDOWS 95 STYLE BUT NEON) */
+            .window {
+                position: absolute;
+                background-color: var(--win-bg);
+                border: var(--border-style);
+                box-shadow: var(--box-shadow-style);
+                z-index: 100;
+                display: flex;
+                flex-direction: column;
+                min-width: 250px;
+                min-height: 150px;
+                opacity: 0;
+                transform: scale(0.95);
+                transition:
+                    opacity 0.15s ease,
+                    transform 0.15s ease;
+                pointer-events: none;
+            }
+
+            .window.active-win {
+                opacity: 1;
+                transform: scale(1);
+                pointer-events: all;
+            }
+
+            /* WINDOW TITLE BAR */
+            .window-titlebar {
+                background: var(--titlebar-gradient);
+                padding: 4px 8px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                cursor: move;
+                border-bottom: 1px solid var(--neon-cyan);
+            }
+
+            .window-title {
+                font-weight: bold;
+                font-size: 13px;
+                color: #fff;
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                text-shadow: 0 0 4px #000;
+            }
+
+            .window-controls {
+                display: flex;
+                gap: 4px;
+            }
+
+            .win-btn {
+                width: 18px;
+                height: 18px;
+                background: #110826;
+                border: 1px solid var(--neon-cyan);
+                color: var(--neon-cyan);
+                font-size: 10px;
+                font-weight: bold;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 1px 1px 0px #000;
+            }
+
+            .win-btn:active {
+                box-shadow: none;
+                transform: translate(1px, 1px);
+            }
+
+            .win-btn.close-btn {
+                border-color: var(--neon-pink);
+                color: var(--neon-pink);
+            }
+
+            /* WINDOW CONTENT */
+            .window-body {
+                padding: 12px;
+                flex-grow: 1;
+                overflow-y: auto;
+                font-size: 12px;
+            }
+
+            /* SCROLLBAR CUSTOMIZATION */
+            ::-webkit-scrollbar {
+                width: 8px;
+                height: 8px;
+            }
+            ::-webkit-scrollbar-track {
+                background: #110826;
+                border-left: 1px solid var(--neon-cyan);
+            }
+            ::-webkit-scrollbar-thumb {
+                background: var(--neon-pink);
+                border: 1px solid var(--neon-cyan);
+            }
+
+            /* BOTONES ESTILO WIN95 NEON */
+            .btn-95 {
+                background: #110826;
+                color: var(--neon-cyan);
+                border: 2px solid var(--neon-cyan);
+                padding: 6px 12px;
+                cursor: pointer;
+                font-weight: bold;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 5px;
+                box-shadow: 3px 3px 0px var(--neon-pink);
+                text-transform: uppercase;
+                font-size: 11px;
+            }
+
+            .btn-95:hover {
+                background: var(--neon-cyan);
+                color: #000;
+                box-shadow: 0 0 10px var(--neon-cyan);
+            }
+
+            .btn-95:active {
+                transform: translate(2px, 2px);
+                box-shadow: 1px 1px 0px var(--neon-pink);
+            }
+
+            .btn-95-danger {
+                color: var(--neon-pink);
+                border-color: var(--neon-pink);
+                box-shadow: 3px 3px 0px var(--neon-cyan);
+            }
+            .btn-95-danger:hover {
+                background: var(--neon-pink);
+                color: #fff;
+                box-shadow: 0 0 10px var(--neon-pink);
+            }
+
+            /* CAMPOS DE TEXTO RETRO */
+            .input-95 {
+                background: #090312;
+                border: 2px solid var(--neon-pink);
+                color: var(--neon-cyan);
+                padding: 6px 8px;
+                outline: none;
+                width: 100%;
+                font-size: 12px;
+                box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.8);
+            }
+
+            .input-95:focus {
+                border-color: var(--neon-cyan);
+                box-shadow: 0 0 8px var(--neon-cyan);
+            }
+
+            /* BARRA DE TAREAS INFERIOR (WINDOWS 95) */
+            .taskbar {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 40px;
+                background: #140a2b;
+                border-top: 3px solid var(--neon-pink);
+                z-index: 1000;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0 10px;
+                box-shadow: 0 -4px 10px rgba(255, 0, 127, 0.3);
+            }
+
+            body.theme-terminal .taskbar {
+                background: #000;
+                border-top: 2px solid #fff;
+                box-shadow: none;
+            }
+
+            .taskbar-left {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .start-btn {
+                background: linear-gradient(
+                    135deg,
+                    var(--neon-pink),
+                    var(--neon-purple)
+                );
+                color: #fff;
+                border: 2px solid var(--neon-cyan);
+                font-weight: bold;
+                padding: 4px 10px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 12px;
+                box-shadow: 2px 2px 0px #000;
+            }
+
+            .start-btn:active {
+                transform: translate(1px, 1px);
+                box-shadow: none;
+            }
+
+            .start-btn svg {
+                width: 16px;
+                height: 16px;
+            }
+
+            .taskbar-apps {
+                display: flex;
+                gap: 6px;
+            }
+
+            .task-tab {
+                background: #1e113a;
+                border: 1px solid var(--neon-cyan);
+                color: var(--neon-cyan);
+                padding: 4px 12px;
+                font-size: 11px;
+                cursor: pointer;
+                max-width: 120px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .task-tab.active-tab {
+                background: var(--neon-cyan);
+                color: #000;
+                font-weight: bold;
+            }
+
+            .taskbar-right {
+                background: #090312;
+                border: 1px solid var(--neon-pink);
+                padding: 4px 8px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                font-size: 11px;
+                color: var(--neon-pink);
+            }
+
+            body.theme-terminal .taskbar-right {
+                border-color: #fff;
+                color: #fff;
+            }
+
+            /* START MENU (RETRO POPUP) */
+            .start-menu {
+                position: absolute;
+                bottom: 42px;
+                left: 10px;
+                width: 220px;
+                background: var(--win-bg);
+                border: 2px solid var(--neon-cyan);
+                box-shadow: 3px 3px 15px rgba(0, 240, 255, 0.4);
+                z-index: 1100;
+                display: none;
+            }
+
+            .start-menu-sidebar {
+                background: linear-gradient(
+                    180deg,
+                    var(--neon-pink),
+                    var(--neon-purple)
+                );
+                width: 30px;
+                display: flex;
+                align-items: flex-end;
+                justify-content: center;
+                padding-bottom: 10px;
+            }
+
+            body.theme-terminal .start-menu-sidebar {
+                background: #333;
+            }
+
+            .start-menu-title {
+                writing-mode: vertical-rl;
+                transform: rotate(180deg);
+                font-weight: bold;
+                color: #fff;
+                font-size: 14px;
+                letter-spacing: 2px;
+            }
+
+            .start-menu-content {
+                display: flex;
+                width: 100%;
+            }
+
+            .start-menu-list {
+                flex-grow: 1;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .start-menu-item {
+                padding: 8px 12px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                cursor: pointer;
+                color: #fff;
+                font-size: 11px;
+            }
+
+            .start-menu-item:hover {
+                background: var(--neon-cyan);
+                color: #000;
+            }
+
+            .start-menu-item svg {
+                width: 18px;
+                height: 18px;
+            }
+
+            .start-menu-divider {
+                height: 1px;
+                background: var(--neon-pink);
+                margin: 4px 0;
+            }
+
+            /* LOGIN SCREEN MODAL (CON PESTAÑAS) */
+            .login-overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(10, 5, 22, 0.95);
+                z-index: 10000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .login-box {
+                width: 380px;
+                background: var(--win-bg);
+                border: 3px double var(--neon-cyan);
+                box-shadow: 0 0 25px var(--neon-cyan);
+            }
+
+            .login-title {
+                background: linear-gradient(
+                    90deg,
+                    var(--neon-pink),
+                    var(--neon-purple)
+                );
+                color: #fff;
+                padding: 6px 12px;
+                font-weight: bold;
+                border-bottom: 2px solid var(--neon-cyan);
+                font-size: 13px;
+                text-align: center;
+            }
+
+            .login-tabs {
+                display: flex;
+                border-bottom: 2px solid var(--neon-pink);
+                background: #090312;
+            }
+
+            .login-tab-btn {
+                flex: 1;
+                background: none;
+                border: none;
+                color: var(--text-muted);
+                padding: 8px;
+                cursor: pointer;
+                font-weight: bold;
+                font-size: 11px;
+                text-align: center;
+            }
+
+            .login-tab-btn.active-tab {
+                background: var(--win-bg);
+                color: var(--neon-cyan);
+                border-bottom: 2px solid var(--neon-cyan);
+            }
+
+            .login-body {
+                padding: 20px;
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .avatar-selector {
+                display: flex;
+                gap: 10px;
+                justify-content: center;
+                margin-bottom: 10px;
+            }
+
+            .avatar-option {
+                width: 45px;
+                height: 45px;
+                border: 2px solid var(--neon-pink);
+                border-radius: 50%;
+                cursor: pointer;
+                overflow: hidden;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: #110826;
+            }
+
+            .avatar-option.selected {
+                border-color: var(--neon-cyan);
+                box-shadow: 0 0 8px var(--neon-cyan);
+            }
+
+            .avatar-option img,
+            .avatar-option svg {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            /* PROFILE & FAVORITES UI */
+            .profile-info {
+                display: flex;
+                gap: 15px;
+                border-bottom: 1px dashed var(--neon-pink);
+                padding-bottom: 12px;
+                margin-bottom: 12px;
+            }
+
+            .profile-pic-container {
+                width: 70px;
+                height: 70px;
+                border: 2px solid var(--neon-cyan);
+                box-shadow: 0 0 5px var(--neon-cyan);
+                background: #110826;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                overflow: hidden;
+                cursor: pointer;
+                position: relative;
+            }
+
+            .profile-pic-container img,
+            .profile-pic-container svg {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            .profile-pic-upload {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                opacity: 0;
+                cursor: pointer;
+            }
+
+            .profile-details {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                gap: 5px;
+            }
+
+            .fav-list {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+                gap: 10px;
+                margin-top: 10px;
+            }
+
+            .fav-card {
+                background: #110826;
+                border: 1px solid var(--neon-pink);
+                padding: 6px;
+                text-align: center;
+                cursor: pointer;
+            }
+
+            .fav-card:hover {
+                border-color: var(--neon-cyan);
+                box-shadow: 0 0 5px var(--neon-cyan);
+            }
+
+            .fav-card img {
+                width: 100%;
+                height: 90px;
+                object-fit: cover;
+                margin-bottom: 6px;
+                border: 1px solid #331550;
+            }
+
+            .fav-card-title {
+                font-size: 10px;
+                font-weight: bold;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            /* SEARCH / API VIEW */
+            .search-bar-container {
+                display: flex;
+                gap: 8px;
+                margin-bottom: 12px;
+            }
+
+            .results-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+                gap: 12px;
+                max-height: 350px;
+                overflow-y: auto;
+            }
+
+            .anime-card {
+                background: #110826;
+                border: 2px solid var(--neon-pink);
+                padding: 8px;
+                cursor: pointer;
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+                transition: transform 0.1s ease;
+            }
+
+            .anime-card:hover {
+                transform: translateY(-2px);
+                border-color: var(--neon-cyan);
+                box-shadow: 0 0 8px var(--neon-cyan);
+            }
+
+            .anime-card img {
+                width: 100%;
+                height: 140px;
+                object-fit: cover;
+                border: 1px solid #3d1c63;
+            }
+
+            .anime-card-title {
+                font-weight: bold;
+                font-size: 11px;
+                height: 28px;
+                overflow: hidden;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                color: #fff;
+            }
+
+            /* ANIME DETAIL WINDOW */
+            .anime-detail-container {
+                display: flex;
+                gap: 15px;
+                flex-direction: row;
+            }
+
+            @media (max-width: 600px) {
+                .anime-detail-container {
+                    flex-direction: column;
+                }
+            }
+
+            .anime-detail-left {
+                width: 150px;
+                flex-shrink: 0;
+            }
+
+            .anime-detail-left img {
+                width: 100%;
+                border: 2px solid var(--neon-cyan);
+                box-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
+            }
+
+            .anime-detail-right {
+                flex-grow: 1;
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .anime-info-badge {
+                display: inline-block;
+                padding: 2px 6px;
+                background: #25124b;
+                border: 1px solid var(--neon-pink);
+                font-size: 10px;
+                color: var(--neon-pink);
+                margin-right: 5px;
+                margin-bottom: 5px;
+            }
+
+            .episode-list {
+                margin-top: 10px;
+                max-height: 180px;
+                overflow-y: auto;
+                border: 1px solid var(--neon-pink);
+                background: #090312;
+            }
+
+            .episode-item {
+                padding: 8px 12px;
+                border-bottom: 1px solid #200d3d;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                cursor: pointer;
+            }
+
+            .episode-item:hover {
+                background: #25124b;
+                color: var(--neon-cyan);
+            }
+
+            /* REPRODUCTOR WINDOW & COMMENTS */
+            .player-container {
+                background: #000;
+                width: 100%;
+                aspect-ratio: 16/9;
+                border: 2px solid var(--neon-pink);
+                margin-bottom: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: relative;
+            }
+
+            .player-placeholder {
+                color: var(--neon-cyan);
+                font-weight: bold;
+                text-align: center;
+                padding: 20px;
+            }
+
+            .server-list-container {
+                margin-top: 10px;
+                border-bottom: 1px dashed var(--neon-pink);
+                padding-bottom: 12px;
+                margin-bottom: 12px;
+            }
+
+            .server-group {
+                margin-bottom: 10px;
+            }
+
+            .server-buttons {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                margin-top: 5px;
+            }
+
+            /* SECCION COMENTARIOS THREADED */
+            .comments-section {
+                background: #0a0416;
+                border: 1px solid var(--neon-cyan);
+                padding: 10px;
+                margin-top: 10px;
+            }
+
+            body.theme-terminal .comments-section {
+                background: #000;
+                border-color: #fff;
+            }
+
+            .comments-title {
+                font-size: 11px;
+                font-weight: bold;
+                color: var(--neon-cyan);
+                margin-bottom: 8px;
+                border-bottom: 1px solid var(--neon-pink);
+                padding-bottom: 4px;
+            }
+
+            .comments-list {
+                max-height: 250px;
+                overflow-y: auto;
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                margin-bottom: 10px;
+            }
+
+            .comment-card {
+                display: flex;
+                gap: 8px;
+                background: #140b2d;
+                padding: 6px;
+                border-left: 3px solid var(--neon-pink);
+            }
+
+            .comment-card.is-reply {
+                margin-left: 25px;
+                border-left: 2px solid var(--neon-cyan);
+                background: #0c051e;
+            }
+
+            body.theme-terminal .comment-card {
+                background: #111;
+                border-left-color: #fff;
+            }
+            body.theme-terminal .comment-card.is-reply {
+                border-left-color: #888;
+                background: #080808;
+            }
+
+            .comment-avatar {
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                background: #000;
+                overflow: hidden;
+                flex-shrink: 0;
+            }
+
+            .comment-avatar svg,
+            .comment-avatar img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            .comment-content {
+                flex-grow: 1;
+            }
+
+            .comment-header {
+                display: flex;
+                justify-content: space-between;
+                font-size: 9px;
+                color: var(--neon-cyan);
+                margin-bottom: 3px;
+            }
+
+            .comment-text {
+                font-size: 10px;
+                color: #fff;
+                word-break: break-all;
+            }
+
+            .comment-actions {
+                margin-top: 4px;
+                font-size: 9px;
+                text-align: right;
+            }
+
+            .comment-action-btn {
+                color: var(--neon-cyan);
+                cursor: pointer;
+                text-decoration: none;
+                font-weight: bold;
+            }
+
+            .comment-action-btn:hover {
+                text-decoration: underline;
+            }
+
+            .reply-banner {
+                background: #19092c;
+                border: 1px solid var(--neon-cyan);
+                padding: 4px 8px;
+                font-size: 9px;
+                margin-bottom: 6px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                color: var(--neon-pink);
+            }
+
+            body.theme-terminal .reply-banner {
+                background: #111;
+                border-color: #fff;
+                color: #fff;
+            }
+
+            .comment-form {
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+            }
+
+            .comment-input-row {
+                display: flex;
+                gap: 8px;
+            }
+
+            /* SECCIÓN NOTIFICACIONES WINDOW */
+            .notif-item {
+                padding: 8px;
+                border-bottom: 1px solid #200d3d;
+                background: #130a24;
+                margin-bottom: 6px;
+                font-size: 10px;
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+                position: relative;
+            }
+
+            .notif-item.unread {
+                border-left: 3px solid var(--neon-pink);
+                background: #1e0d37;
+            }
+
+            body.theme-terminal .notif-item {
+                background: #111;
+                border-bottom-color: #333;
+            }
+            body.theme-terminal .notif-item.unread {
+                border-left-color: #fff;
+                background: #1a1a1a;
+            }
+
+            .notif-time {
+                font-size: 8px;
+                color: var(--text-muted);
+            }
+
+            .wallpaper-preview {
+                width: 100%;
+                height: 60px;
+                border: 1px solid var(--neon-pink);
+                margin-top: 5px;
+                background-size: cover;
+                background-position: center;
+            }
+
+            .retro-alert {
+                padding: 10px;
+                background: #2e091b;
+                border: 1px solid var(--neon-pink);
+                color: #fff;
+                font-size: 11px;
+                margin-bottom: 10px;
+            }
+        </style>
+    </head>
+    <body class="theme-neon">
+        <!-- RETRO CRT SCANLINE OVERLAY -->
+        <div class="desktop-bg" id="desktop">
+            <!-- DESKTOP ICONS -->
+            <div class="desktop-icons">
+                <div class="desktop-icon" onclick="openWindow('win-search')">
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <circle cx="11" cy="11" r="8" stroke="#00f0ff" />
+                        <line
+                            x1="21"
+                            y1="21"
+                            x2="16.65"
+                            y2="16.65"
+                            stroke="#00f0ff"
+                        />
+                        <polygon
+                            points="8 10 11 13 16 8"
+                            stroke="#ff007f"
+                            stroke-width="1.5"
+                        />
+                    </svg>
+                    <span class="desktop-icon-label">Buscador Anime</span>
+                </div>
+
+                <div class="desktop-icon" onclick="openWindow('win-profile')">
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path
+                            d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"
+                            stroke="#00f0ff"
+                        />
+                        <circle cx="12" cy="7" r="4" stroke="#ff007f" />
+                    </svg>
+                    <span class="desktop-icon-label">Mi Perfil</span>
+                </div>
+
+                <div class="desktop-icon" onclick="openWindow('win-favorites')">
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path
+                            d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                            fill="#ff007f"
+                            stroke="#00f0ff"
+                        />
+                    </svg>
+                    <span class="desktop-icon-label">Favoritos</span>
+                </div>
+
+                <!-- ICONO NOTIFICACIONES -->
+                <div
+                    class="desktop-icon"
+                    onclick="openWindow('win-notifications')"
+                >
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path
+                            d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"
+                            stroke="#00f0ff"
+                        />
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0" stroke="#ff007f" />
+                    </svg>
+                    <span class="desktop-icon-label">Notificaciones</span>
+                    <div
+                        class="notification-badge"
+                        id="notif-desktop-badge"
+                        style="display: none"
+                    >
+                        0
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- WINDOW 1: BUSCADOR DE ANIME                -->
+            <!-- ========================================== -->
+            <div
+                class="window"
+                id="win-search"
+                style="top: 8%; left: 15%; width: 620px; max-width: 90%"
+            >
+                <div class="window-titlebar">
+                    <div class="window-title">
+                        <svg
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="#fff"
+                            stroke-width="2"
+                        >
+                            <circle cx="11" cy="11" r="8" />
+                            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                        </svg>
+                        Buscador Anime - DCE-ANIME
+                    </div>
+                    <div class="window-controls">
+                        <button
+                            class="win-btn"
+                            onclick="minimizeWindow('win-search')"
+                        >
+                            _
+                        </button>
+                        <button
+                            class="win-btn close-btn"
+                            onclick="closeWindow('win-search')"
+                        >
+                            X
+                        </button>
+                    </div>
+                </div>
+                <div class="window-body">
+                    <div class="retro-alert">
+                        <span class="neon-text-cyan">Modo de Operación:</span>
+                        <span id="api-mode-indicator" class="neon-text-green"
+                            >Demo Local (Sin API)</span
+                        >
+                        - Cambia a API Real en "Ajustes API" (en Menú Inicio).
+                    </div>
+                    <div class="search-bar-container">
+                        <input
+                            type="text"
+                            id="search-input"
+                            class="input-95"
+                            placeholder="Escribe tu anime favorito (ej. Naruto, One Piece, Frieren...)"
+                            onkeydown="
+                                if (event.key === 'Enter') executeSearch();
+                            "
+                        />
+                        <button class="btn-95" onclick="executeSearch()">
+                            Buscar
+                        </button>
+                    </div>
+
+                    <div
+                        id="search-loading"
+                        style="display: none; text-align: center; padding: 20px"
+                        class="neon-text-pink"
+                    >
+                        Buscando en la base de datos cyberpunk...
+                    </div>
+
+                    <div class="results-grid" id="search-results">
+                        <!-- Dinámico -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- WINDOW 2: INFO / DETALLES ANIME            -->
+            <!-- ========================================== -->
+            <div
+                class="window"
+                id="win-details"
+                style="top: 15%; left: 20%; width: 550px; max-width: 90%"
+            >
+                <div class="window-titlebar">
+                    <div class="window-title">
+                        <svg
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="#fff"
+                            stroke-width="2"
+                        >
+                            <path
+                                d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"
+                            />
+                            <path d="M12 16v-4" />
+                            <path d="M12 8h.01" />
+                        </svg>
+                        Ficha Técnica
+                    </div>
+                    <div class="window-controls">
+                        <button
+                            class="win-btn"
+                            onclick="minimizeWindow('win-details')"
+                        >
+                            _
+                        </button>
+                        <button
+                            class="win-btn close-btn"
+                            onclick="closeWindow('win-details')"
+                        >
+                            X
+                        </button>
+                    </div>
+                </div>
+                <div class="window-body">
+                    <div
+                        class="anime-detail-container"
+                        id="anime-details-content"
+                    >
+                        <!-- Dinámico -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- WINDOW 3: REPRODUCTOR DE EPISODIOS          -->
+            <!-- ========================================== -->
+            <div
+                class="window"
+                id="win-player"
+                style="top: 5%; left: 30%; width: 620px; max-width: 95%"
+            >
+                <div class="window-titlebar">
+                    <div class="window-title">
+                        <svg
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="#fff"
+                            stroke-width="2"
+                        >
+                            <polygon points="5 3 19 12 5 21 5 3" />
+                        </svg>
+                        Cine-Vapor Player -
+                        <span id="player-title">Cargando...</span>
+                    </div>
+                    <div class="window-controls">
+                        <button
+                            class="win-btn"
+                            onclick="minimizeWindow('win-player')"
+                        >
+                            _
+                        </button>
+                        <button
+                            class="win-btn close-btn"
+                            onclick="closeWindow('win-player')"
+                        >
+                            X
+                        </button>
+                    </div>
+                </div>
+                <div class="window-body">
+                    <div class="player-container">
+                        <iframe
+                            id="video-frame"
+                            style="
+                                width: 100%;
+                                height: 100%;
+                                border: none;
+                                display: none;
+                            "
+                            allowfullscreen
+                        ></iframe>
+                        <div
+                            id="player-placeholder-el"
+                            class="player-placeholder"
+                        >
+                            <span class="neon-text-pink">CYBERPLAYER v1.1</span
+                            ><br /><br />
+                            <span class="neon-text-cyan" style="font-size: 10px"
+                                >Selecciona un servidor de la lista inferior
+                                para cargar la transmisión...</span
+                            >
+                        </div>
+                    </div>
+
+                    <div class="server-list-container">
+                        <h4
+                            class="neon-text-pink"
+                            style="margin-bottom: 5px; font-size: 12px"
+                        >
+                            SERVIDORES DISPONIBLES:
+                        </h4>
+
+                        <div class="server-group">
+                            <div
+                                style="
+                                    font-size: 10px;
+                                    color: var(--neon-cyan);
+                                    margin-bottom: 4px;
+                                "
+                            >
+                                Subtitulado (SUB):
+                            </div>
+                            <div
+                                class="server-buttons"
+                                id="servers-sub-container"
+                            >
+                                <!-- Dinámico -->
+                            </div>
+                        </div>
+
+                        <div class="server-group">
+                            <div
+                                style="
+                                    font-size: 10px;
+                                    color: var(--neon-cyan);
+                                    margin-bottom: 4px;
+                                "
+                            >
+                                Doblado (DUB):
+                            </div>
+                            <div
+                                class="server-buttons"
+                                id="servers-dub-container"
+                            >
+                                <!-- Dinámico -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECCIÓN DE COMENTARIOS MEJORADA -->
+                    <div class="comments-section">
+                        <div class="comments-title">
+                            DISCUSIÓN DE LA COMUNIDAD DCE
+                        </div>
+                        <div class="comments-list" id="episode-comments-list">
+                            <!-- Dinámico -->
+                        </div>
+
+                        <!-- BANNER DE RESPUESTA ACTIVA -->
+                        <div
+                            id="reply-banner"
+                            class="reply-banner"
+                            style="display: none"
+                        >
+                            <span
+                                >Respondiendo a @<b id="reply-to-user"
+                                    >User</b
+                                ></span
+                            >
+                            <span
+                                style="cursor: pointer; font-weight: bold"
+                                onclick="cancelReplyMode()"
+                                >[X]</span
+                            >
+                        </div>
+
+                        <div class="comment-form">
+                            <div class="comment-input-row">
+                                <input
+                                    type="text"
+                                    id="new-comment-input"
+                                    class="input-95"
+                                    placeholder="Escribe un comentario o respuesta, pe..."
+                                    onkeydown="
+                                        if (event.key === 'Enter')
+                                            postComment();
+                                    "
+                                />
+                                <button class="btn-95" onclick="postComment()">
+                                    Comentar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- WINDOW 4: MI PERFIL                        -->
+            <!-- ========================================== -->
+            <div
+                class="window"
+                id="win-profile"
+                style="top: 22%; left: 10%; width: 450px; max-width: 90%"
+            >
+                <div class="window-titlebar">
+                    <div class="window-title">
+                        <svg
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="#fff"
+                            stroke-width="2"
+                        >
+                            <path
+                                d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"
+                            />
+                            <circle cx="12" cy="7" r="4" />
+                        </svg>
+                        Mi Perfil - DCE-ANIME
+                    </div>
+                    <div class="window-controls">
+                        <button
+                            class="win-btn"
+                            onclick="minimizeWindow('win-profile')"
+                        >
+                            _
+                        </button>
+                        <button
+                            class="win-btn close-btn"
+                            onclick="closeWindow('win-profile')"
+                        >
+                            X
+                        </button>
+                    </div>
+                </div>
+                <div class="window-body">
+                    <div class="profile-info">
+                        <div
+                            class="profile-pic-container"
+                            title="Haz clic para subir foto"
+                        >
+                            <div id="profile-avatar-img"></div>
+                            <input
+                                type="file"
+                                id="profile-pic-input"
+                                class="profile-pic-upload"
+                                accept="image/*"
+                                onchange="uploadProfilePic(event)"
+                            />
+                        </div>
+                        <div class="profile-details">
+                            <h2
+                                id="profile-username-el"
+                                class="neon-text-pink"
+                                style="font-size: 18px"
+                            >
+                                Usuario
+                            </h2>
+                            <div
+                                style="
+                                    font-size: 10px;
+                                    color: var(--text-muted);
+                                "
+                            >
+                                MIEMBRO REGISTRADO EN DCE-NET
+                            </div>
+                            <button
+                                class="btn-95"
+                                style="
+                                    margin-top: 5px;
+                                    padding: 2px 8px;
+                                    font-size: 9px;
+                                "
+                                onclick="
+                                    document
+                                        .getElementById('profile-pic-input')
+                                        .click()
+                                "
+                            >
+                                Cambiar Foto
+                            </button>
+                        </div>
+                    </div>
+
+                    <h3
+                        class="neon-text-cyan"
+                        style="
+                            font-size: 12px;
+                            margin-top: 10px;
+                            margin-bottom: 10px;
+                        "
+                    >
+                        ANIME FAVORITOS:
+                    </h3>
+                    <div class="fav-list" id="profile-favs-container">
+                        <!-- Dinámico -->
+                    </div>
+
+                    <div style="margin-top: 20px; text-align: right">
+                        <button
+                            class="btn-95 btn-95-danger"
+                            onclick="logoutUser()"
+                        >
+                            Cerrar Sesión
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- WINDOW 5: FAVORITOS                         -->
+            <!-- ========================================== -->
+            <div
+                class="window"
+                id="win-favorites"
+                style="top: 20%; left: 35%; width: 480px; max-width: 90%"
+            >
+                <div class="window-titlebar">
+                    <div class="window-title">
+                        <svg
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="#fff"
+                            stroke-width="2"
+                        >
+                            <path
+                                d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                            />
+                        </svg>
+                        Mi Colección de Favoritos
+                    </div>
+                    <div class="window-controls">
+                        <button
+                            class="win-btn"
+                            onclick="minimizeWindow('win-favorites')"
+                        >
+                            _
+                        </button>
+                        <button
+                            class="win-btn close-btn"
+                            onclick="closeWindow('win-favorites')"
+                        >
+                            X
+                        </button>
+                    </div>
+                </div>
+                <div class="window-body">
+                    <div
+                        id="favorites-empty-msg"
+                        style="text-align: center; padding: 20px"
+                        class="neon-text-pink"
+                    >
+                        Aún no tienes favoritos. ¡Busca animes y agrégalos!
+                    </div>
+                    <div class="fav-list" id="favorites-full-container">
+                        <!-- Dinámico -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- WINDOW 6: AJUSTES API                      -->
+            <!-- ========================================== -->
+            <div
+                class="window"
+                id="win-api-settings"
+                style="top: 30%; left: 45%; width: 400px; max-width: 90%"
+            >
+                <div class="window-titlebar">
+                    <div class="window-title">Ajustes de la API de Anime</div>
+                    <div class="window-controls">
+                        <button
+                            class="win-btn"
+                            onclick="minimizeWindow('win-api-settings')"
+                        >
+                            _
+                        </button>
+                        <button
+                            class="win-btn close-btn"
+                            onclick="closeWindow('win-api-settings')"
+                        >
+                            X
+                        </button>
+                    </div>
+                </div>
+                <div
+                    class="window-body"
+                    style="display: flex; flex-direction: column; gap: 12px"
+                >
+                    <div>
+                        <label
+                            style="
+                                display: block;
+                                font-size: 10px;
+                                color: var(--neon-cyan);
+                                margin-bottom: 4px;
+                            "
+                            >MODO DE API:</label
+                        >
+                        <select
+                            id="api-mode-select"
+                            class="input-95"
+                            style="background: #110826"
+                            onchange="toggleApiMode()"
+                        >
+                            <option value="demo">
+                                Demo Integrada (Recomendado sin servidor)
+                            </option>
+                            <option value="real">
+                                API Local (Requiere servidor levantado)
+                            </option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label
+                            style="
+                                display: block;
+                                font-size: 10px;
+                                color: var(--neon-cyan);
+                                margin-bottom: 4px;
+                            "
+                            >URL BASE DEL SERVIDOR (API):</label
+                        >
+                        <input
+                            type="text"
+                            id="api-base-url"
+                            class="input-95"
+                            value="http://localhost:3000/api/v1/anime"
+                        />
+                    </div>
+
+                    <div>
+                        <label
+                            style="
+                                display: block;
+                                font-size: 10px;
+                                color: var(--neon-cyan);
+                                margin-bottom: 4px;
+                            "
+                            >X-API-KEY DE ANIME1V:</label
+                        >
+                        <input
+                            type="password"
+                            id="api-key-input"
+                            class="input-95"
+                            placeholder="Pega tu api key aquí"
+                        />
+                    </div>
+
+                    <button class="btn-95" onclick="saveApiSettings()">
+                        Guardar Ajustes
+                    </button>
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- WINDOW 7: AJUSTES DE DISEÑO / FONDO / TEMA -->
+            <!-- ========================================== -->
+            <div
+                class="window"
+                id="win-design-settings"
+                style="top: 25%; left: 30%; width: 420px; max-width: 90%"
+            >
+                <div class="window-titlebar">
+                    <div class="window-title">Personalizar Pantalla & Tema</div>
+                    <div class="window-controls">
+                        <button
+                            class="win-btn"
+                            onclick="minimizeWindow('win-design-settings')"
+                        >
+                            _
+                        </button>
+                        <button
+                            class="win-btn close-btn"
+                            onclick="closeWindow('win-design-settings')"
+                        >
+                            X
+                        </button>
+                    </div>
+                </div>
+                <div
+                    class="window-body"
+                    style="display: flex; flex-direction: column; gap: 12px"
+                >
+                    <div>
+                        <label
+                            style="
+                                display: block;
+                                font-size: 10px;
+                                color: var(--neon-cyan);
+                                margin-bottom: 4px;
+                            "
+                            >SELECCIONAR TEMA:</label
+                        >
+                        <select
+                            id="theme-select"
+                            class="input-95"
+                            onchange="changeVisualTheme()"
+                        >
+                            <option value="neon">
+                                Cyber Neon original (Rosa, Púrpura, Cian)
+                            </option>
+                            <option value="terminal">
+                                Modo Terminal Oscuro (Contornos Blancos y Negro)
+                            </option>
+                        </select>
+                    </div>
+
+                    <div
+                        style="
+                            border-top: 1px dashed var(--neon-pink);
+                            padding-top: 10px;
+                        "
+                    >
+                        <label
+                            style="
+                                display: block;
+                                font-size: 10px;
+                                color: var(--neon-cyan);
+                                margin-bottom: 4px;
+                            "
+                            >FONDO DE PANTALLA (WALLPAPER DE TU CUENTA):</label
+                        >
+                        <div
+                            style="
+                                display: flex;
+                                flex-direction: column;
+                                gap: 8px;
+                            "
+                        >
+                            <button
+                                class="btn-95"
+                                onclick="setPresetWallpaper('grid')"
+                            >
+                                Cuadrícula Neón (Default)
+                            </button>
+                            <button
+                                class="btn-95"
+                                onclick="setPresetWallpaper('black')"
+                            >
+                                Negro Absoluto
+                            </button>
+                            <div style="display: flex; gap: 5px">
+                                <input
+                                    type="text"
+                                    id="wallpaper-url-input"
+                                    class="input-95"
+                                    placeholder="Pega el URL de una imagen"
+                                />
+                                <button
+                                    class="btn-95"
+                                    onclick="setCustomWallpaperUrl()"
+                                >
+                                    Aplicar URL
+                                </button>
+                            </div>
+                            <div>
+                                <button
+                                    class="btn-95"
+                                    style="width: 100%"
+                                    onclick="
+                                        document
+                                            .getElementById(
+                                                'wallpaper-file-input',
+                                            )
+                                            .click()
+                                    "
+                                >
+                                    Subir Imagen desde PC
+                                </button>
+                                <input
+                                    type="file"
+                                    id="wallpaper-file-input"
+                                    style="display: none"
+                                    accept="image/*"
+                                    onchange="uploadCustomWallpaper(event)"
+                                />
+                            </div>
+                        </div>
+                        <div
+                            style="
+                                font-size: 9px;
+                                margin-top: 5px;
+                                color: var(--text-muted);
+                            "
+                        >
+                            PREVISUALIZACIÓN:
+                        </div>
+                        <div
+                            id="wallpaper-preview-box"
+                            class="wallpaper-preview"
+                        ></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- WINDOW 8: NOTIFICACIONES                   -->
+            <!-- ========================================== -->
+            <div
+                class="window"
+                id="win-notifications"
+                style="top: 25%; left: 35%; width: 450px; max-width: 90%"
+            >
+                <div class="window-titlebar">
+                    <div class="window-title">
+                        <svg
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="#fff"
+                            stroke-width="2"
+                        >
+                            <path
+                                d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"
+                            />
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                        </svg>
+                        Centro de Alertas & Notificaciones
+                    </div>
+                    <div class="window-controls">
+                        <button
+                            class="win-btn"
+                            onclick="minimizeWindow('win-notifications')"
+                        >
+                            _
+                        </button>
+                        <button
+                            class="win-btn close-btn"
+                            onclick="closeWindow('win-notifications')"
+                        >
+                            X
+                        </button>
+                    </div>
+                </div>
+                <div
+                    class="window-body"
+                    style="display: flex; flex-direction: column; gap: 10px"
+                >
+                    <!-- ANUNCIOS DEL ADMIN -->
+                    <div
+                        style="
+                            border: 1px dashed var(--neon-cyan);
+                            padding: 8px;
+                            background: #110526;
+                            margin-bottom: 5px;
+                        "
+                    >
+                        <span
+                            class="neon-text-pink"
+                            style="font-weight: bold; font-size: 11px"
+                            >📡 ANUNCIO DEL ADMINISTRADOR:</span
+                        ><br />
+                        <span style="font-size: 10px; color: #fff"
+                            >¡DCE-ANIME v1.2 lanzado! Ahora puedes subir fondos
+                            de pantalla únicos por cuenta, responder comentarios
+                            específicos y recibir alertas de respuestas en
+                            tiempo real.</span
+                        >
+                    </div>
+
+                    <div
+                        style="
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            border-bottom: 1px solid var(--neon-pink);
+                            padding-bottom: 5px;
+                        "
+                    >
+                        <h3 class="neon-text-cyan" style="font-size: 11px">
+                            ALERTAS DE RESPUESTA
+                        </h3>
+                        <button
+                            class="btn-95"
+                            style="font-size: 8px; padding: 2px 6px"
+                            onclick="clearAllNotifications()"
+                        >
+                            Limpiar Alertas
+                        </button>
+                    </div>
+
+                    <div
+                        id="notifications-list"
+                        style="max-height: 250px; overflow-y: auto"
+                    >
+                        <!-- Dinámico -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- LOGIN / REGISTER SCREEN (TABS MEJORADOS) -->
+        <!-- ========================================== -->
+        <div class="login-overlay" id="login-screen">
+            <div class="login-box">
+                <div class="login-title">DCE-ANIME v1.2 - ACCESO CENTRAL</div>
+
+                <div class="login-tabs">
+                    <button
+                        class="login-tab-btn"
+                        id="tab-login-btn"
+                        onclick="switchLoginTab('login')"
+                    >
+                        INICIAR SESIÓN
+                    </button>
+                    <button
+                        class="login-tab-btn active-tab"
+                        id="tab-register-btn"
+                        onclick="switchLoginTab('register')"
+                    >
+                        CREAR CUENTA
+                    </button>
+                </div>
+
+                <div class="login-body">
+                    <div style="text-align: center; margin-bottom: 5px">
+                        <h1
+                            class="neon-text-pink"
+                            style="font-size: 24px; letter-spacing: 2px"
+                        >
+                            DCE-ANIME
+                        </h1>
+                        <p class="neon-text-cyan" style="font-size: 9px">
+                            TU COMUNIDAD DE ANIME EN NEÓN
+                        </p>
+                    </div>
+
+                    <!-- FORMULARIO DE INICIO -->
+                    <div
+                        id="form-login-fields"
+                        style="display: none; flex-direction: column; gap: 12px"
+                    >
+                        <div
+                            style="
+                                display: flex;
+                                flex-direction: column;
+                                gap: 4px;
+                            "
+                        >
+                            <label
+                                style="font-size: 10px; color: var(--neon-cyan)"
+                                >Nombre de Usuario:</label
+                            >
+                            <input
+                                type="text"
+                                id="login-username"
+                                class="input-95"
+                                placeholder="Tu usuario Otaku"
+                                value=""
+                            />
+                        </div>
+                        <div
+                            style="
+                                display: flex;
+                                flex-direction: column;
+                                gap: 4px;
+                            "
+                        >
+                            <label
+                                style="font-size: 10px; color: var(--neon-cyan)"
+                                >Contraseña:</label
+                            >
+                            <input
+                                type="password"
+                                id="login-password"
+                                class="input-95"
+                                placeholder="Escribe tu contraseña"
+                                value=""
+                            />
+                        </div>
+                        <button
+                            class="btn-95"
+                            style="margin-top: 10px"
+                            onclick="executeLogin()"
+                        >
+                            ENTRAR AL DESKTOP ➜
+                        </button>
+                    </div>
+
+                    <!-- FORMULARIO DE REGISTRO -->
+                    <div
+                        id="form-register-fields"
+                        style="display: flex; flex-direction: column; gap: 10px"
+                    >
+                        <div
+                            style="
+                                display: flex;
+                                flex-direction: column;
+                                gap: 4px;
+                            "
+                        >
+                            <label
+                                style="font-size: 10px; color: var(--neon-cyan)"
+                                >Elige un Nombre de Usuario (Único):</label
+                            >
+                            <input
+                                type="text"
+                                id="reg-username"
+                                class="input-95"
+                                placeholder="Ej. ElLuffy95"
+                            />
+                        </div>
+                        <div
+                            style="
+                                display: flex;
+                                flex-direction: column;
+                                gap: 4px;
+                            "
+                        >
+                            <label
+                                style="font-size: 10px; color: var(--neon-cyan)"
+                                >Crea una Contraseña:</label
+                            >
+                            <input
+                                type="password"
+                                id="reg-password"
+                                class="input-95"
+                                placeholder="Escribe tu contraseña segura"
+                            />
+                        </div>
+
+                        <div>
+                            <label
+                                style="
+                                    font-size: 10px;
+                                    color: var(--neon-cyan);
+                                    display: block;
+                                    margin-bottom: 6px;
+                                    text-align: center;
+                                "
+                                >Elige tu Avatar de Inicio:</label
+                            >
+                            <div class="avatar-selector">
+                                <div
+                                    class="avatar-option selected"
+                                    onclick="selectLoginAvatar(0, this)"
+                                >
+                                    <svg viewBox="0 0 100 100">
+                                        <rect
+                                            width="100"
+                                            height="100"
+                                            fill="#2d1045"
+                                        />
+                                        <circle
+                                            cx="50"
+                                            cy="40"
+                                            r="20"
+                                            fill="#ff007f"
+                                        />
+                                        <path
+                                            d="M15 85 C20 60, 80 60, 85 85 Z"
+                                            fill="#00f0ff"
+                                        />
+                                        <rect
+                                            x="42"
+                                            y="30"
+                                            width="16"
+                                            height="5"
+                                            fill="#fff"
+                                        />
+                                    </svg>
+                                </div>
+                                <div
+                                    class="avatar-option"
+                                    onclick="selectLoginAvatar(1, this)"
+                                >
+                                    <svg viewBox="0 0 100 100">
+                                        <rect
+                                            width="100"
+                                            height="100"
+                                            fill="#140628"
+                                        />
+                                        <circle
+                                            cx="50"
+                                            cy="40"
+                                            r="18"
+                                            fill="#00f0ff"
+                                        />
+                                        <path
+                                            d="M10 90 C20 70, 80 70, 90 90 Z"
+                                            fill="#ff007f"
+                                        />
+                                        <polygon
+                                            points="50,15 40,30 60,30"
+                                            fill="#39ff14"
+                                        />
+                                    </svg>
+                                </div>
+                                <div
+                                    class="avatar-option"
+                                    onclick="selectLoginAvatar(2, this)"
+                                >
+                                    <svg viewBox="0 0 100 100">
+                                        <rect
+                                            width="100"
+                                            height="100"
+                                            fill="#2d0515"
+                                        />
+                                        <circle
+                                            cx="50"
+                                            cy="45"
+                                            r="22"
+                                            fill="#39ff14"
+                                        />
+                                        <path
+                                            d="M20 90 L80 90 L50 65 Z"
+                                            fill="#8b00ff"
+                                        />
+                                    </svg>
+                                </div>
+                                <div
+                                    class="avatar-option"
+                                    onclick="selectLoginAvatar(3, this)"
+                                >
+                                    <svg viewBox="0 0 100 100">
+                                        <rect
+                                            width="100"
+                                            height="100"
+                                            fill="#051a24"
+                                        />
+                                        <circle
+                                            cx="50"
+                                            cy="38"
+                                            r="16"
+                                            fill="#ffb703"
+                                        />
+                                        <path
+                                            d="M15 85 Q50 55 85 85 Z"
+                                            fill="#fb8500"
+                                        />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button
+                            class="btn-95"
+                            style="margin-top: 5px"
+                            onclick="executeRegister()"
+                        >
+                            REGISTRAR & INICIAR SESIÓN
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- BARRA DE TAREAS (TASKBAR)                  -->
+        <!-- ========================================== -->
+        <div class="taskbar">
+            <div class="taskbar-left">
+                <button class="start-btn" onclick="toggleStartMenu()">
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <rect x="2" y="2" width="9" height="9" fill="#ff007f" />
+                        <rect
+                            x="13"
+                            y="2"
+                            width="9"
+                            height="9"
+                            fill="#00f0ff"
+                        />
+                        <rect
+                            x="2"
+                            y="13"
+                            width="9"
+                            height="9"
+                            fill="#8b00ff"
+                        />
+                        <rect
+                            x="13"
+                            y="13"
+                            width="9"
+                            height="9"
+                            fill="#39ff14"
+                        />
+                    </svg>
+                    DCE-ANIME
+                </button>
+
+                <!-- MENU DE INICIO EMULADO -->
+                <div class="start-menu" id="start-menu">
+                    <div class="start-menu-content">
+                        <div class="start-menu-sidebar">
+                            <div class="start-menu-title">NEON-95</div>
+                        </div>
+                        <div class="start-menu-list">
+                            <div
+                                class="start-menu-item"
+                                onclick="
+                                    openWindow('win-search');
+                                    toggleStartMenu();
+                                "
+                            >
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <circle
+                                        cx="11"
+                                        cy="11"
+                                        r="8"
+                                        stroke="#00f0ff"
+                                    />
+                                    <line
+                                        x1="21"
+                                        y1="21"
+                                        x2="16.65"
+                                        y2="16.65"
+                                        stroke="#ff007f"
+                                    />
+                                </svg>
+                                Buscador Anime
+                            </div>
+                            <div
+                                class="start-menu-item"
+                                onclick="
+                                    openWindow('win-profile');
+                                    toggleStartMenu();
+                                "
+                            >
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <path
+                                        d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"
+                                        stroke="#00f0ff"
+                                    />
+                                    <circle
+                                        cx="12"
+                                        cy="7"
+                                        r="4"
+                                        stroke="#ff007f"
+                                    />
+                                </svg>
+                                Mi Perfil
+                            </div>
+                            <div
+                                class="start-menu-item"
+                                onclick="
+                                    openWindow('win-favorites');
+                                    toggleStartMenu();
+                                "
+                            >
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <path
+                                        d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                                        fill="#ff007f"
+                                        stroke="#00f0ff"
+                                    />
+                                </svg>
+                                Favoritos
+                            </div>
+                            <div
+                                class="start-menu-item"
+                                onclick="
+                                    openWindow('win-design-settings');
+                                    toggleStartMenu();
+                                "
+                            >
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <rect
+                                        x="3"
+                                        y="3"
+                                        width="18"
+                                        height="18"
+                                        rx="2"
+                                        stroke="#00f0ff"
+                                    />
+                                    <path
+                                        d="M9 17v-4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4"
+                                        stroke="#ff007f"
+                                    />
+                                </svg>
+                                Diseño & Tema
+                            </div>
+                            <div
+                                class="start-menu-item"
+                                onclick="
+                                    openWindow('win-notifications');
+                                    toggleStartMenu();
+                                "
+                            >
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <path
+                                        d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"
+                                    />
+                                    <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                                </svg>
+                                Notificaciones
+                            </div>
+                            <div class="start-menu-divider"></div>
+                            <div
+                                class="start-menu-item"
+                                onclick="
+                                    promptAdminApiSettings();
+                                    toggleStartMenu();
+                                "
+                            >
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <circle
+                                        cx="12"
+                                        cy="12"
+                                        r="3"
+                                        stroke="#00f0ff"
+                                    />
+                                    <path
+                                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"
+                                        stroke="#ff007f"
+                                    />
+                                </svg>
+                                Ajustes API
+                            </div>
+                            <div class="start-menu-divider"></div>
+                            <div class="start-menu-item" onclick="logoutUser()">
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <path
+                                        d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"
+                                        stroke="#ff007f"
+                                    />
+                                    <polyline
+                                        points="16 17 21 12 16 7"
+                                        stroke="#00f0ff"
+                                    />
+                                    <line
+                                        x1="21"
+                                        y1="12"
+                                        x2="9"
+                                        y2="12"
+                                        stroke="#00f0ff"
+                                    />
+                                </svg>
+                                Cerrar Sesión
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TABS DE VENTANAS ABIERTAS -->
+                <div class="taskbar-apps" id="taskbar-tabs-container">
+                    <!-- Dinámico -->
+                </div>
+            </div>
+
+            <div class="taskbar-right">
+                <span>DCE-NET</span>
+                <span id="taskbar-clock">12:00 PM</span>
+            </div>
+        </div>
+
+        <script>
+            // ==========================================
+            // BASE DE DATOS DEMO (FALLBACK)
+            // ==========================================
+            const DEMO_ANIME_DB = [
+                {
+                    title: "Kimetsu no Yaiba: Hashira Training Arc",
+                    url: "https://animeav1.com/media/kimetsu-no-yaiba-hashira-training-arc",
+                    cover: "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=300&q=80",
+                    genres: ["Acción", "Fantasía", "Histórico", "Shounen"],
+                    score: "8.9",
+                    synopsis:
+                        "Los pilares se preparan para la batalla final contra Muzan Kibutsuji a través de un entrenamiento riguroso de todos los cazadores de demonios.",
+                    totalEpisodes: 5,
+                    episodes: [
+                        {
+                            number: 1,
+                            title: "Para derrotar a Muzan",
+                            url: "https://animeav1.com/media/kimetsu-no-yaiba-hashira-training-arc/1",
+                        },
+                        {
+                            number: 2,
+                            title: "El dolor del pilar de agua",
+                            url: "https://animeav1.com/media/kimetsu-no-yaiba-hashira-training-arc/2",
+                        },
+                        {
+                            number: 3,
+                            title: "Tanjiro recuperado",
+                            url: "https://animeav1.com/media/kimetsu-no-yaiba-hashira-training-arc/3",
+                        },
+                        {
+                            number: 4,
+                            title: "El entrenamiento de la roca",
+                            url: "https://animeav1.com/media/kimetsu-no-yaiba-hashira-training-arc/4",
+                        },
+                        {
+                            number: 5,
+                            title: "Infiltración",
+                            url: "https://animeav1.com/media/kimetsu-no-yaiba-hashira-training-arc/5",
+                        },
+                    ],
+                },
+                {
+                    title: "Chainsaw Man",
+                    url: "https://animeav1.com/media/chainsaw-man",
+                    cover: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=300&q=80",
+                    genres: ["Acción", "Gore", "Sobrenatural", "Comedia Negra"],
+                    score: "9.2",
+                    synopsis:
+                        "Denji es un adolescente que vive con un demonio motosierra llamado Pochita. Debido a las deudas que dejó su padre, ha estado viviendo en la pobreza extrema.",
+                    totalEpisodes: 3,
+                    episodes: [
+                        {
+                            number: 1,
+                            title: "Perro y Motosierra",
+                            url: "https://animeav1.com/media/chainsaw-man/1",
+                        },
+                        {
+                            number: 2,
+                            title: "Llegada a Tokio",
+                            url: "https://animeav1.com/media/chainsaw-man/2",
+                        },
+                        {
+                            number: 3,
+                            title: "El destino de Nyako",
+                            url: "https://animeav1.com/media/chainsaw-man/3",
+                        },
+                    ],
+                },
+                {
+                    title: "Sousou no Frieren",
+                    url: "https://animeav1.com/media/sousou-no-frieren",
+                    cover: "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=300&q=80",
+                    genres: ["Aventura", "Fantasía", "Drama"],
+                    score: "9.6",
+                    synopsis:
+                        "La maga elfa Frieren y sus valientes compañeros han derrotado al Rey Demonio, trayendo paz a la tierra.",
+                    totalEpisodes: 4,
+                    episodes: [
+                        {
+                            number: 1,
+                            title: "El fin del viaje",
+                            url: "https://animeav1.com/media/sousou-no-frieren/1",
+                        },
+                        {
+                            number: 2,
+                            title: "No tenía que ser un milagro",
+                            url: "https://animeav1.com/media/sousou-no-frieren/2",
+                        },
+                        {
+                            number: 3,
+                            title: "Fuego de dragon",
+                            url: "https://animeav1.com/media/sousou-no-frieren/3",
+                        },
+                        {
+                            number: 4,
+                            title: "El fantasma de la aldea",
+                            url: "https://animeav1.com/media/sousou-no-frieren/4",
+                        },
+                    ],
+                },
+                {
+                    title: "One Piece (Egghead Arc)",
+                    url: "https://animeav1.com/media/one-piece",
+                    cover: "https://images.unsplash.com/photo-1560169897-fc0cdbdfa4d5?w=300&q=80",
+                    genres: ["Shounen", "Acción", "Aventura", "Comedia"],
+                    score: "9.5",
+                    synopsis:
+                        "Monkey D. Luffy llega a la futurista isla Egghead del Dr. Vegapunk.",
+                    totalEpisodes: 3,
+                    episodes: [
+                        {
+                            number: 1089,
+                            title: "¡Entrando en un nuevo capítulo! ¡El camino de Luffy!",
+                            url: "https://animeav1.com/media/one-piece/1089",
+                        },
+                        {
+                            number: 1090,
+                            title: "¡Una nueva isla! Egghead",
+                            url: "https://animeav1.com/media/one-piece/1090",
+                        },
+                        {
+                            number: 1091,
+                            title: "¡Aventura en la isla de la ciencia!",
+                            url: "https://animeav1.com/media/one-piece/1091",
+                        },
+                    ],
+                },
+            ];
+
+            const DEMO_SERVERS = {
+                sub: [
+                    {
+                        server: "CyberPlayer (No-Lag)",
+                        url: "https://www.w3schools.com/html/mov_bbb.mp4",
+                    },
+                    {
+                        server: "Mega-Neon",
+                        url: "https://www.w3schools.com/html/movie.mp4",
+                    },
+                ],
+                dub: [
+                    {
+                        server: "Latino Cyber",
+                        url: "https://www.w3schools.com/html/movie.mp4",
+                    },
+                ],
+            };
+
+            // ==========================================
+            // VARIABLES DE SISTEMA
+            // ==========================================
+            let activeWindows = [];
+            let focusedWindowId = null;
+            let selectedAvatarIndex = 0;
+
+            // Estados de Usuario
+            let currentUser = null;
+            let favorites = [];
+            let currentLoginTab = "register";
+            let currentViewingEpisodeUrl = null;
+            let activeReplyToComment = null; // Guardará el comentario al que estamos respondiendo
+
+            // Ajustes de API iniciales
+            let apiSettings = {
+                mode: "real",
+                baseUrl: "http://localhost:3000/api/v1/anime",
+                apiKey: "dev-anime1v-key",
+            };
+
+            // ==========================================
+            // CARGA DE PÁGINA (INIT)
+            // ==========================================
+            window.onload = function () {
+                // 0. Ejecutar migración automática de caché local (Comentarios, etc.)
+                migrateCommentsAndLocalData();
+
+                // 1. Cargar Ajustes de API
+                const savedApi = localStorage.getItem("dce_api_settings");
+                if (savedApi) {
+                    apiSettings = JSON.parse(savedApi);
+                }
+                document.getElementById("api-mode-select").value =
+                    apiSettings.mode;
+                document.getElementById("api-base-url").value =
+                    apiSettings.baseUrl;
+                document.getElementById("api-key-input").value =
+                    apiSettings.apiKey;
+                updateApiIndicator();
+
+                // Crear cuentas de usuario por defecto
+                initializeDefaultUsers();
+
+                // 2. Cargar sesión de usuario activa
+                const sessionUser =
+                    sessionStorage.getItem("dce_active_user") ||
+                    localStorage.getItem("dce_active_user");
+                if (sessionUser) {
+                    currentUser = JSON.parse(sessionUser);
+                    loadUserFavoritesAndProfile();
+
+                    // Cargar ajustes visuales de ESTE usuario específico
+                    loadUserVisualSettings();
+
+                    hideLoginScreen();
+                    initDesktop();
+                }
+
+                // Reloj y arrastre
+                updateClock();
+                setInterval(updateClock, 1000);
+                makeWindowsDraggable();
+            };
+
+            function migrateCommentsAndLocalData() {
+                // Limpiar comentarios de AdminDCE y dar IDs a comentarios viejos que no lo tengan
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key && key.startsWith("dce_comments_")) {
+                        try {
+                            let comments =
+                                JSON.parse(localStorage.getItem(key)) || [];
+                            // Filtrar y eliminar AdminDCE
+                            comments = comments.filter(
+                                (c) =>
+                                    c.username !== "AdminDCE" &&
+                                    c.username !== "Admin",
+                            );
+                            // Dar IDs a los que no tengan
+                            comments = comments.map((c) => {
+                                if (!c.id) {
+                                    c.id =
+                                        "c_mig_" +
+                                        Math.random().toString(36).substr(2, 5);
+                                }
+                                return c;
+                            });
+                            localStorage.setItem(key, JSON.stringify(comments));
+                        } catch (e) {
+                            console.error(
+                                "Error migrando comentarios viejos:",
+                                e,
+                            );
+                        }
+                    }
+                }
+            }
+
+            function updateClock() {
+                const clockEl = document.getElementById("taskbar-clock");
+                const now = new Date();
+                let hours = now.getHours();
+                let minutes = now.getMinutes();
+                const ampm = hours >= 12 ? "PM" : "AM";
+                hours = hours % 12;
+                hours = hours ? hours : 12;
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                clockEl.textContent = `${hours}:${minutes} ${ampm}`;
+            }
+
+            // ==========================================
+            // SISTEMA DE USUARIOS LOCALES
+            // ==========================================
+            function initializeDefaultUsers() {
+                let users = localStorage.getItem("dce_registered_users");
+                if (!users) {
+                    const defaultUsers = [
+                        {
+                            username: "DceOtaku",
+                            password: "123",
+                            avatar: `<svg viewBox="0 0 100 100"><rect width="100" height="100" fill="#2d1045"/><circle cx="50" cy="40" r="20" fill="#ff007f"/><path d="M15 85 C20 60, 80 60, 85 85 Z" fill="#00f0ff"/><rect x="42" y="30" width="16" height="5" fill="#fff"/></svg>`,
+                        },
+                    ];
+                    localStorage.setItem(
+                        "dce_registered_users",
+                        JSON.stringify(defaultUsers),
+                    );
+                }
+            }
+
+            function switchLoginTab(tab) {
+                currentLoginTab = tab;
+                document
+                    .getElementById("tab-login-btn")
+                    .classList.toggle("active-tab", tab === "login");
+                document
+                    .getElementById("tab-register-btn")
+                    .classList.toggle("active-tab", tab === "register");
+                document.getElementById("form-login-fields").style.display =
+                    tab === "login" ? "flex" : "none";
+                document.getElementById("form-register-fields").style.display =
+                    tab === "register" ? "flex" : "none";
+            }
+
+            function selectLoginAvatar(index, el) {
+                const options = document.querySelectorAll(
+                    "#form-register-fields .avatar-option",
+                );
+                options.forEach((opt) => opt.classList.remove("selected"));
+                el.classList.add("selected");
+                selectedAvatarIndex = index;
+            }
+
+            // REGISTRO SIN NOMBRES REPETIDOS y CON ALERTA DE CLAVE
+            function executeRegister() {
+                const username = document
+                    .getElementById("reg-username")
+                    .value.trim();
+                const password = document.getElementById("reg-password").value;
+
+                if (!username || !password) {
+                    alert("¡Bro! Debes llenar tu usuario y contraseña, pe.");
+                    return;
+                }
+
+                if (username.length < 3) {
+                    alert("¡Usuario muy corto! Mínimo 3 letras.");
+                    return;
+                }
+
+                let users =
+                    JSON.parse(localStorage.getItem("dce_registered_users")) ||
+                    [];
+
+                // Validar nombre repetido
+                const exists = users.some(
+                    (u) => u.username.toLowerCase() === username.toLowerCase(),
+                );
+                if (exists) {
+                    alert(
+                        "¡Ese nombre de Otaku ya está registrado, bro! Elige otro pe.",
+                    );
+                    return;
+                }
+
+                // Obtener avatar
+                const avatarSvg = document
+                    .querySelectorAll("#form-register-fields .avatar-option")
+                    [selectedAvatarIndex].querySelector("svg").outerHTML;
+
+                const newUser = { username, password, avatar: avatarSvg };
+                users.push(newUser);
+                localStorage.setItem(
+                    "dce_registered_users",
+                    JSON.stringify(users),
+                );
+
+                // Auto login
+                currentUser = newUser;
+                sessionStorage.setItem(
+                    "dce_active_user",
+                    JSON.stringify(currentUser),
+                );
+                localStorage.setItem(
+                    "dce_active_user",
+                    JSON.stringify(currentUser),
+                );
+                loadUserFavoritesAndProfile();
+
+                // Crear ajustes visuales por defecto para el nuevo usuario
+                saveUserVisualSettings({ theme: "neon", wallpaper: "grid" });
+                loadUserVisualSettings();
+
+                hideLoginScreen();
+                initDesktop();
+
+                // Agregar notificación de bienvenida
+                addNotification(
+                    username,
+                    "¡Bienvenido a DCE-ANIME v1.2, bro! Tu propio centro de streaming personalizado. ¡Agrega tus animes a favoritos pe!",
+                    "admin",
+                );
+
+                alert(
+                    `¡Cuenta creada con éxito, bro! Bienvenido a DCE-ANIME, ${username}.`,
+                );
+            }
+
+            // INICIAR SESIÓN CON CLAVE
+            function executeLogin() {
+                const usernameInput = document
+                    .getElementById("login-username")
+                    .value.trim();
+                const passwordInput =
+                    document.getElementById("login-password").value;
+
+                if (!usernameInput || !passwordInput) {
+                    alert("¡Escribe tu usuario y contraseña pe!");
+                    return;
+                }
+
+                let users =
+                    JSON.parse(localStorage.getItem("dce_registered_users")) ||
+                    [];
+                const userFound = users.find(
+                    (u) =>
+                        u.username.toLowerCase() ===
+                        usernameInput.toLowerCase(),
+                );
+
+                if (!userFound || userFound.password !== passwordInput) {
+                    alert(
+                        "¡Usuario o contraseña incorrectos, bro! Intenta de nuevo.",
+                    );
+                    return;
+                }
+
+                currentUser = userFound;
+                sessionStorage.setItem(
+                    "dce_active_user",
+                    JSON.stringify(currentUser),
+                );
+                localStorage.setItem(
+                    "dce_active_user",
+                    JSON.stringify(currentUser),
+                );
+                loadUserFavoritesAndProfile();
+
+                // Cargar fondo y tema ligado a ESTE usuario
+                loadUserVisualSettings();
+
+                hideLoginScreen();
+                initDesktop();
+            }
+
+            function loadUserFavoritesAndProfile() {
+                favorites =
+                    JSON.parse(
+                        localStorage.getItem(
+                            `dce_favs_${currentUser.username}`,
+                        ),
+                    ) || [];
+            }
+
+            function logoutUser() {
+                sessionStorage.removeItem("dce_active_user");
+                localStorage.removeItem("dce_active_user");
+                currentUser = null;
+                favorites = [];
+                document.getElementById("login-screen").style.display = "flex";
+
+                // Cerrar todas las ventanas abiertas
+                activeWindows.forEach((winId) => {
+                    const win = document.getElementById(winId);
+                    if (win) win.classList.remove("active-win");
+                });
+                activeWindows = [];
+                renderTaskbarTabs();
+            }
+
+            function hideLoginScreen() {
+                document.getElementById("login-screen").style.display = "none";
+            }
+
+            function initDesktop() {
+                document.getElementById("profile-username-el").textContent =
+                    currentUser.username;
+
+                const avatarContainer =
+                    document.getElementById("profile-avatar-img");
+                if (currentUser.avatar.startsWith("data:image")) {
+                    avatarContainer.innerHTML = `<img src="${currentUser.avatar}" style="width:100%; height:100%; object-fit:cover;">`;
+                } else {
+                    avatarContainer.innerHTML = currentUser.avatar;
+                }
+
+                renderFavorites();
+                updateNotificationsUI();
+                openWindow("win-search");
+                executeSearch();
+            }
+
+            function uploadProfilePic(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const base64Img = e.target.result;
+                    currentUser.avatar = base64Img;
+
+                    // Actualizar en el registro
+                    let users =
+                        JSON.parse(
+                            localStorage.getItem("dce_registered_users"),
+                        ) || [];
+                    users = users.map((u) =>
+                        u.username === currentUser.username
+                            ? { ...u, avatar: base64Img }
+                            : u,
+                    );
+                    localStorage.setItem(
+                        "dce_registered_users",
+                        JSON.stringify(users),
+                    );
+
+                    // Guardar sesión
+                    sessionStorage.setItem(
+                        "dce_active_user",
+                        JSON.stringify(currentUser),
+                    );
+
+                    // Actualizar interfaz
+                    document.getElementById("profile-avatar-img").innerHTML =
+                        `<img src="${base64Img}" style="width:100%; height:100%; object-fit:cover;">`;
+                };
+                reader.readAsDataURL(file);
+            }
+
+            // ==========================================
+            // PERSONALIZACIÓN: WALLPAPERS LIGADOS A LA CUENTA
+            // ==========================================
+            function loadUserVisualSettings() {
+                const defaultVisual = { theme: "neon", wallpaper: "grid" };
+                const savedVisual = localStorage.getItem(
+                    `dce_visual_settings_${currentUser.username}`,
+                );
+                const settings = savedVisual
+                    ? JSON.parse(savedVisual)
+                    : defaultVisual;
+
+                applyVisualTheme(settings.theme);
+                applyWallpaper(settings.wallpaper, settings.theme);
+            }
+
+            function saveUserVisualSettings(settings) {
+                localStorage.setItem(
+                    `dce_visual_settings_${currentUser.username}`,
+                    JSON.stringify(settings),
+                );
+            }
+
+            function getUserVisualSettingsObj() {
+                const saved = localStorage.getItem(
+                    `dce_visual_settings_${currentUser.username}`,
+                );
+                return saved
+                    ? JSON.parse(saved)
+                    : { theme: "neon", wallpaper: "grid" };
+            }
+
+            function changeVisualTheme() {
+                const select = document.getElementById("theme-select");
+                const currentSettings = getUserVisualSettingsObj();
+                currentSettings.theme = select.value;
+
+                applyVisualTheme(currentSettings.theme);
+                applyWallpaper(
+                    currentSettings.wallpaper,
+                    currentSettings.theme,
+                );
+                saveUserVisualSettings(currentSettings);
+            }
+
+            function applyVisualTheme(theme) {
+                document.body.className =
+                    theme === "terminal" ? "theme-terminal" : "theme-neon";
+                document.getElementById("theme-select").value = theme;
+            }
+
+            function applyWallpaper(wallpaper, theme) {
+                const desktop = document.getElementById("desktop");
+                const preview = document.getElementById(
+                    "wallpaper-preview-box",
+                );
+
+                if (wallpaper === "grid") {
+                    if (theme === "terminal") {
+                        desktop.style.backgroundImage =
+                            "linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px)";
+                    } else {
+                        desktop.style.backgroundImage =
+                            "linear-gradient(rgba(255, 0, 127, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 0, 127, 0.1) 1px, transparent 1px)";
+                    }
+                    desktop.style.backgroundColor = "";
+                    preview.style.backgroundImage = "";
+                    preview.style.backgroundColor = "#110826";
+                } else if (wallpaper === "black") {
+                    desktop.style.backgroundImage = "none";
+                    desktop.style.backgroundColor = "#000000";
+                    preview.style.backgroundImage = "none";
+                    preview.style.backgroundColor = "#000000";
+                } else {
+                    desktop.style.backgroundImage = `url('${wallpaper}')`;
+                    desktop.style.backgroundSize = "cover";
+                    desktop.style.backgroundPosition = "center";
+                    preview.style.backgroundImage = `url('${wallpaper}')`;
+                }
+            }
+
+            function changeUserWallpaper(wallpaper) {
+                const currentSettings = getUserVisualSettingsObj();
+                currentSettings.wallpaper = wallpaper;
+                applyWallpaper(
+                    currentSettings.wallpaper,
+                    currentSettings.theme,
+                );
+                saveUserVisualSettings(currentSettings);
+            }
+
+            function setPresetWallpaper(type) {
+                changeUserWallpaper(type);
+            }
+
+            function setCustomWallpaperUrl() {
+                const url = document
+                    .getElementById("wallpaper-url-input")
+                    .value.trim();
+                if (!url) return;
+                changeUserWallpaper(url);
+            }
+
+            function compressAndApplyWallpaper(base64Str) {
+                const img = new Image();
+                img.src = base64Str;
+                img.onload = function () {
+                    const canvas = document.createElement("canvas");
+                    const ctx = canvas.getContext("2d");
+                    let width = img.width;
+                    let height = img.height;
+                    const max_size = 1000;
+                    if (width > height) {
+                        if (width > max_size) {
+                            height *= max_size / width;
+                            width = max_size;
+                        }
+                    } else {
+                        if (height > max_size) {
+                            width *= max_size / height;
+                            height = max_size;
+                        }
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    ctx.drawImage(img, 0, 0, width, height);
+                    const compressedBase64 = canvas.toDataURL(
+                        "image/jpeg",
+                        0.6,
+                    );
+                    changeUserWallpaper(compressedBase64);
+                };
+            }
+
+            function uploadCustomWallpaper(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    compressAndApplyWallpaper(e.target.result);
+                };
+                reader.readAsDataURL(file);
+            }
+
+            function promptAdminApiSettings() {
+                const pin = prompt(
+                    "🔐 INGRESE CLAVE DE ACCESO DEL SISTEMA (ADMINISTRADOR):",
+                );
+                if (pin === "MINECRAFT12345PIA12345XD") {
+                    openWindow("win-api-settings");
+                } else if (pin !== null) {
+                    alert(
+                        "❌ ERROR 403: ACCESO DENEGADO. Clave de administrador incorrecta, pe.",
+                    );
+                }
+            }
+
+            // ==========================================
+            // SISTEMA DE VENTANAS (DRAG & FOCUS)
+            // ==========================================
+            function openWindow(winId) {
+                const win = document.getElementById(winId);
+                if (!win) return;
+
+                if (!activeWindows.includes(winId)) {
+                    win.style.top = `${10 + activeWindows.length * 4}%`;
+                    win.style.left = `${15 + activeWindows.length * 4}%`;
+                    activeWindows.push(winId);
+                }
+
+                win.classList.add("active-win");
+                focusWindow(winId);
+                renderTaskbarTabs();
+            }
+
+            function closeWindow(winId) {
+                const win = document.getElementById(winId);
+                if (win) {
+                    win.classList.remove("active-win");
+                }
+                activeWindows = activeWindows.filter((id) => id !== winId);
+                if (focusedWindowId === winId) {
+                    focusedWindowId =
+                        activeWindows[activeWindows.length - 1] || null;
+                }
+                renderTaskbarTabs();
+            }
+
+            function minimizeWindow(winId) {
+                const win = document.getElementById(winId);
+                if (win) {
+                    win.classList.remove("active-win");
+                }
+                if (focusedWindowId === winId) {
+                    focusedWindowId = null;
+                }
+                renderTaskbarTabs();
+            }
+
+            function focusWindow(winId) {
+                focusedWindowId = winId;
+                activeWindows.forEach((id) => {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        if (id === winId) {
+                            el.style.zIndex = 1000;
+                        } else {
+                            el.style.zIndex = 100 + activeWindows.indexOf(id);
+                        }
+                    }
+                });
+                renderTaskbarTabs();
+            }
+
+            function toggleStartMenu() {
+                const menu = document.getElementById("start-menu");
+                menu.style.display =
+                    menu.style.display === "block" ? "none" : "block";
+            }
+
+            function renderTaskbarTabs() {
+                const container = document.getElementById(
+                    "taskbar-tabs-container",
+                );
+                container.innerHTML = "";
+
+                const windowNames = {
+                    "win-search": "Buscar",
+                    "win-details": "Ficha",
+                    "win-player": "Reproductor",
+                    "win-profile": "Perfil",
+                    "win-favorites": "Favoritos",
+                    "win-design-settings": "Tema",
+                    "win-notifications": "Notif",
+                    "win-api-settings": "Ajustes API",
+                };
+
+                activeWindows.forEach((winId) => {
+                    const isActiveInUi = document
+                        .getElementById(winId)
+                        .classList.contains("active-win");
+                    const isFocused = focusedWindowId === winId && isActiveInUi;
+
+                    const tab = document.createElement("button");
+                    tab.className = `task-tab ${isFocused ? "active-tab" : ""}`;
+                    tab.textContent = windowNames[winId] || "Ventana";
+                    tab.onclick = function () {
+                        if (isFocused) {
+                            minimizeWindow(winId);
+                        } else {
+                            openWindow(winId);
+                        }
+                    };
+                    container.appendChild(tab);
+                });
+            }
+
+            function makeWindowsDraggable() {
+                const windows = document.querySelectorAll(".window");
+                windows.forEach((win) => {
+                    const titlebar = win.querySelector(".window-titlebar");
+                    let pos1 = 0,
+                        pos2 = 0,
+                        pos3 = 0,
+                        pos4 = 0;
+
+                    titlebar.onmousedown = dragMouseDown;
+
+                    function dragMouseDown(e) {
+                        e = e || window.event;
+                        focusWindow(win.id);
+                        if (e.target.classList.contains("win-btn")) return;
+
+                        e.preventDefault();
+                        pos3 = e.clientX;
+                        pos4 = e.clientY;
+                        document.onmouseup = closeDragElement;
+                        document.onmousemove = elementDrag;
+                    }
+
+                    function elementDrag(e) {
+                        e = e || window.event;
+                        e.preventDefault();
+                        pos1 = pos3 - e.clientX;
+                        pos2 = pos4 - e.clientY;
+                        pos3 = e.clientX;
+                        pos4 = e.clientY;
+
+                        const newTop = win.offsetTop - pos2;
+                        const newLeft = win.offsetLeft - pos1;
+
+                        if (newTop >= 0 && newTop < window.innerHeight - 80) {
+                            win.style.top = newTop + "px";
+                        }
+                        win.style.left = newLeft + "px";
+                    }
+
+                    function closeDragElement() {
+                        document.onmouseup = null;
+                        document.onmousemove = null;
+                    }
+                });
+            }
+
+            // ==========================================
+            // SISTEMA DE API & BÚSQUEDA
+            // ==========================================
+            function toggleApiMode() {
+                apiSettings.mode =
+                    document.getElementById("api-mode-select").value;
+                updateApiIndicator();
+                saveApiSettings();
+            }
+
+            function updateApiIndicator() {
+                const indicator = document.getElementById("api-mode-indicator");
+                const select = document.getElementById("api-mode-select");
+
+                if (apiSettings.mode === "real") {
+                    indicator.textContent = "API REAL ACTIVA";
+                    indicator.className = "neon-text-cyan";
+                    select.value = "real";
+                } else {
+                    indicator.textContent = "Demo Local (Sin API)";
+                    indicator.className = "neon-text-green";
+                    select.value = "demo";
+                }
+            }
+
+            function saveApiSettings() {
+                apiSettings.mode =
+                    document.getElementById("api-mode-select").value;
+                apiSettings.baseUrl = document
+                    .getElementById("api-base-url")
+                    .value.trim();
+                apiSettings.apiKey = document
+                    .getElementById("api-key-input")
+                    .value.trim();
+
+                localStorage.setItem(
+                    "dce_api_settings",
+                    JSON.stringify(apiSettings),
+                );
+                updateApiIndicator();
+            }
+
+            async function apiFetch(endpoint) {
+                if (!apiSettings.apiKey && apiSettings.mode === "real") {
+                    alert("¡Bro! Debes configurar tu API Key.");
+                    throw new Error("Missing API Key");
+                }
+
+                const response = await fetch(
+                    `${apiSettings.baseUrl}${endpoint}`,
+                    {
+                        headers: {
+                            "X-API-Key": apiSettings.apiKey,
+                            "Content-Type": "application/json",
+                        },
+                    },
+                );
+
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status}`);
+                }
+                return response.json();
+            }
+
+            async function executeSearch() {
+                const query = document
+                    .getElementById("search-input")
+                    .value.trim();
+                const resultsContainer =
+                    document.getElementById("search-results");
+                const loading = document.getElementById("search-loading");
+
+                resultsContainer.innerHTML = "";
+                loading.style.display = "block";
+
+                try {
+                    let results = [];
+
+                    if (apiSettings.mode === "real") {
+                        const data = await apiFetch(
+                            `/search?q=${encodeURIComponent(query || "naruto")}&domain=animeav1.com`,
+                        );
+                        if (data && data.data && data.data.results) {
+                            results = data.data.results.map((item) => ({
+                                title: item.title,
+                                url: item.url,
+                                cover:
+                                    item.image ||
+                                    item.cover ||
+                                    "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=300&q=80",
+                            }));
+                        }
+                    } else {
+                        await new Promise((resolve) =>
+                            setTimeout(resolve, 300),
+                        );
+                        if (query) {
+                            results = DEMO_ANIME_DB.filter((anime) =>
+                                anime.title
+                                    .toLowerCase()
+                                    .includes(query.toLowerCase()),
+                            );
+                        } else {
+                            results = DEMO_ANIME_DB;
+                        }
+                    }
+
+                    loading.style.display = "none";
+
+                    if (results.length === 0) {
+                        resultsContainer.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 20px;" class="neon-text-pink">No se encontraron resultados...</div>`;
+                        return;
+                    }
+
+                    results.forEach((anime) => {
+                        const card = document.createElement("div");
+                        card.className = "anime-card";
+                        card.onclick = () => selectAnime(anime.url, anime);
+                        card.innerHTML = `
+            <img src="${anime.cover}" onerror="this.src='https://images.unsplash.com/photo-1578632767115-351597cf2477?w=300&q=80'" alt="Cover">
+            <div class="anime-card-title">${anime.title}</div>
+          `;
+                        resultsContainer.appendChild(card);
+                    });
+                } catch (error) {
+                    console.error("Error buscando:", error);
+                    loading.style.display = "none";
+                    resultsContainer.innerHTML = `
+          <div style="grid-column: 1/-1; text-align: center; padding: 20px;" class="neon-text-pink">
+            ¡Error de Conexión!<br>
+            Asegúrate de que la API en <b style="color:#00f0ff">${apiSettings.baseUrl}</b> esté corriendo.<br><br>
+            <button class="btn-95" onclick="apiSettings.mode='demo'; updateApiIndicator(); executeSearch();">Modo Demo</button>
+          </div>`;
+                }
+            }
+
+            async function selectAnime(animeUrl, basicInfo) {
+                openWindow("win-details");
+                const content = document.getElementById(
+                    "anime-details-content",
+                );
+                content.innerHTML = `<div style="text-align: center; width: 100%; padding: 30px;" class="neon-text-cyan">Cargando expediente...</div>`;
+
+                try {
+                    let animeInfo = null;
+
+                    if (apiSettings.mode === "real") {
+                        const res = await apiFetch(
+                            `/info?url=${encodeURIComponent(animeUrl)}`,
+                        );
+                        if (res && res.data) {
+                            animeInfo = res.data;
+                        }
+                    } else {
+                        await new Promise((resolve) =>
+                            setTimeout(resolve, 200),
+                        );
+                        animeInfo = DEMO_ANIME_DB.find(
+                            (x) => x.url === animeUrl,
+                        ) || {
+                            title: basicInfo.title,
+                            cover: basicInfo.cover,
+                            url: animeUrl,
+                            genres: ["Anime"],
+                            score: "8.0",
+                            synopsis: "Cargado en modo demo local.",
+                            totalEpisodes: 12,
+                            episodes: Array.from({ length: 12 }, (_, i) => ({
+                                number: i + 1,
+                                title: `Episodio ${i + 1}`,
+                                url: `${animeUrl}/${i + 1}`,
+                            })),
+                        };
+                    }
+
+                    if (!animeInfo) {
+                        content.innerHTML = `<div class="neon-text-pink">No se pudo cargar la información.</div>`;
+                        return;
+                    }
+
+                    const isFav = favorites.some(
+                        (fav) => fav.url === animeInfo.url,
+                    );
+
+                    content.innerHTML = `
+          <div class="anime-detail-left">
+            <img src="${animeInfo.cover || animeInfo.image || basicInfo.cover}" onerror="this.src='https://images.unsplash.com/photo-1578632767115-351597cf2477?w=300&q=80'">
+            <button class="btn-95 ${isFav ? "btn-95-danger" : ""}" style="width: 100%; margin-top: 10px;" id="fav-action-btn" onclick="toggleFavorite('${animeInfo.url}', '${animeInfo.title.replace(/'/g, "\\'")}', '${animeInfo.cover || basicInfo.cover}')">
+              ${isFav ? "Quitar Favorito" : "★ Favorito"}
+            </button>
+          </div>
+          <div class="anime-detail-right">
+            <h2 class="neon-text-pink" style="font-size: 16px;">${animeInfo.title}</h2>
+            <div>
+              <span class="anime-info-badge">★ ${animeInfo.score || "N/A"}</span>
+              <span class="anime-info-badge">EPS: ${animeInfo.totalEpisodes || animeInfo.episodes.length}</span>
+            </div>
+            <div style="font-size: 10px; color: var(--text-muted); max-height: 80px; overflow-y: auto; margin-bottom: 5px;">
+              ${animeInfo.synopsis || "Sin descripción."}
+            </div>
+
+            <h4 class="neon-text-cyan" style="font-size: 11px; margin-top: 5px; border-bottom: 1px solid var(--neon-cyan)">LISTA DE CAPÍTULOS:</h4>
+            <div class="episode-list" id="detail-episodes-list">
+              <!-- Dinámico -->
+            </div>
+          </div>
+        `;
+
+                    const epListContainer = document.getElementById(
+                        "detail-episodes-list",
+                    );
+                    animeInfo.episodes.forEach((ep) => {
+                        const item = document.createElement("div");
+                        item.className = "episode-item";
+                        item.onclick = () =>
+                            playEpisode(ep.url, animeInfo.title, ep.number);
+                        item.innerHTML = `
+            <span>Capítulo ${ep.number}</span>
+            <span style="font-size: 9px; color: var(--neon-cyan);">Ver ahora ➜</span>
+          `;
+                        epListContainer.appendChild(item);
+                    });
+                } catch (error) {
+                    console.error("Error al ver anime:", error);
+                    content.innerHTML = `<div class="neon-text-pink">Error al conectar con el servidor para la ficha.</div>`;
+                }
+            }
+
+            // ==========================================
+            // REPRODUCTOR & COMENTARIOS THREADED (REPLIES)
+            // ==========================================
+            async function playEpisode(episodeUrl, animeTitle, epNumber) {
+                openWindow("win-player");
+                document.getElementById("player-title").textContent =
+                    `${animeTitle} - Cap ${epNumber}`;
+                currentViewingEpisodeUrl = episodeUrl;
+                activeReplyToComment = null;
+                document.getElementById("reply-banner").style.display = "none";
+
+                const frame = document.getElementById("video-frame");
+                const placeholder = document.getElementById(
+                    "player-placeholder-el",
+                );
+                const subsContainer = document.getElementById(
+                    "servers-sub-container",
+                );
+                const dubsContainer = document.getElementById(
+                    "servers-dub-container",
+                );
+
+                frame.style.display = "none";
+                placeholder.style.display = "flex";
+                placeholder.innerHTML = `<span class="neon-text-cyan">Extrayendo enlaces de la API...</span>`;
+
+                subsContainer.innerHTML = "";
+                dubsContainer.innerHTML = "";
+
+                // Renderizar comentarios de este capítulo
+                renderEpisodeComments(episodeUrl);
+
+                try {
+                    let servers = { sub: [], dub: [] };
+
+                    if (apiSettings.mode === "real") {
+                        const data = await apiFetch(
+                            `/episode?url=${encodeURIComponent(episodeUrl)}&includeMega=true`,
+                        );
+                        if (data && data.data && data.data.servers) {
+                            servers = data.data.servers;
+                        }
+                    } else {
+                        await new Promise((resolve) =>
+                            setTimeout(resolve, 300),
+                        );
+                        servers = DEMO_SERVERS;
+                    }
+
+                    placeholder.innerHTML = `
+          <span class="neon-text-pink" style="font-size: 14px;">CAPÍTULO EXTRAÍDO</span><br><br>
+          <span class="neon-text-cyan" style="font-size: 10px; max-width: 80%;">Selecciona un servidor abajo para cargar el video en el CyberPlayer.</span>
+        `;
+
+                    // Servidores SUB
+                    if (servers.sub && servers.sub.length > 0) {
+                        servers.sub.forEach((srv) => {
+                            const btn = document.createElement("button");
+                            btn.className = "btn-95";
+                            btn.style.fontSize = "9px";
+                            btn.style.padding = "4px 8px";
+                            btn.textContent = srv.server;
+                            btn.onclick = () =>
+                                loadVideoSource(srv.url, srv.server);
+                            subsContainer.appendChild(btn);
+                        });
+                    } else {
+                        subsContainer.innerHTML = `<span style="font-size: 9px; color: var(--text-muted);">No disponibles</span>`;
+                    }
+
+                    // Servidores DUB
+                    if (servers.dub && servers.dub.length > 0) {
+                        servers.dub.forEach((srv) => {
+                            const btn = document.createElement("button");
+                            btn.className = "btn-95 btn-95-danger";
+                            btn.style.fontSize = "9px";
+                            btn.style.padding = "4px 8px";
+                            btn.textContent = srv.server;
+                            btn.onclick = () =>
+                                loadVideoSource(srv.url, srv.server);
+                            dubsContainer.appendChild(btn);
+                        });
+                    } else {
+                        dubsContainer.innerHTML = `<span style="font-size: 9px; color: var(--text-muted);">No disponibles</span>`;
+                    }
+                } catch (error) {
+                    console.error("Error al obtener servidores:", error);
+                    placeholder.innerHTML = `<span class="neon-text-pink">Error al conectar con la API para extraer servidores.</span>`;
+                }
+            }
+
+            function loadVideoSource(videoUrl, serverName) {
+                const frame = document.getElementById("video-frame");
+                const placeholder = document.getElementById(
+                    "player-placeholder-el",
+                );
+
+                placeholder.style.display = "none";
+                frame.style.display = "block";
+
+                if (
+                    videoUrl.endsWith(".mp4") ||
+                    videoUrl.includes("mov_bbb") ||
+                    videoUrl.includes("movie")
+                ) {
+                    frame.style.display = "none";
+                    placeholder.style.display = "flex";
+                    placeholder.innerHTML = `
+          <video src="${videoUrl}" controls autoplay style="width: 100%; height: 100%; max-height: 250px; background: #000; border: 1px solid var(--neon-cyan);"></video>
+        `;
+                } else {
+                    frame.src = videoUrl;
+                }
+            }
+
+            // GESTIÓN DE COMENTARIOS THREADED EN LOCALSTORAGE
+            function renderEpisodeComments(episodeUrl) {
+                const listContainer = document.getElementById(
+                    "episode-comments-list",
+                );
+                listContainer.innerHTML = "";
+
+                // Cargar comentarios
+                const allComments =
+                    JSON.parse(
+                        localStorage.getItem(`dce_comments_${episodeUrl}`),
+                    ) || [];
+
+                if (allComments.length === 0) {
+                    listContainer.innerHTML = `<div style="text-align:center; padding: 15px; font-size:10px; color:var(--text-muted);">Sé el primero en comentar este capítulo, pe.</div>`;
+                    return;
+                }
+
+                // Separar raíces de respuestas
+                const roots = allComments.filter((c) => !c.parentId);
+                const replies = allComments.filter((c) => c.parentId);
+
+                roots.forEach((comment) => {
+                    // Renderizar comentario raíz
+                    const card = createCommentCardElement(comment, false);
+                    listContainer.appendChild(card);
+
+                    // Renderizar sus respuestas anidadas justo debajo
+                    const childReplies = replies.filter(
+                        (r) => r.parentId === comment.id,
+                    );
+                    childReplies.forEach((reply) => {
+                        const replyCard = createCommentCardElement(reply, true);
+                        listContainer.appendChild(replyCard);
+                    });
+                });
+
+                listContainer.scrollTop = listContainer.scrollHeight;
+            }
+
+            function createCommentCardElement(comment, isReply) {
+                const card = document.createElement("div");
+                card.className = `comment-card ${isReply ? "is-reply" : ""}`;
+
+                let avatarHtml = "";
+                if (comment.avatar.startsWith("data:image")) {
+                    avatarHtml = `<img src="${comment.avatar}">`;
+                } else {
+                    avatarHtml = comment.avatar;
+                }
+
+                card.innerHTML = `
+        <div class="comment-avatar">${avatarHtml}</div>
+        <div class="comment-content">
+          <div class="comment-header">
+            <span class="neon-text-cyan" style="font-weight:bold;">${comment.username}</span>
+            <span style="color:var(--text-muted); font-size:8px;">${comment.timestamp}</span>
+          </div>
+          <div class="comment-text">${comment.text}</div>
+          <div class="comment-actions">
+            ${!isReply ? `<a class="comment-action-btn" onclick="activateReplyMode('${comment.id}', '${comment.username}')">[Responder]</a>` : ""}
+          </div>
+        </div>
+      `;
+                return card;
+            }
+
+            function activateReplyMode(commentId, username) {
+                activeReplyToComment = { id: commentId, username: username };
+                document.getElementById("reply-to-user").textContent = username;
+                document.getElementById("reply-banner").style.display = "flex";
+                document.getElementById("new-comment-input").focus();
+            }
+
+            function cancelReplyMode() {
+                activeReplyToComment = null;
+                document.getElementById("reply-banner").style.display = "none";
+            }
+
+            // ENVIAR COMENTARIO Y DISPARAR NOTIFICACIÓN SI ES RESPUESTA
+            function postComment() {
+                const input = document.getElementById("new-comment-input");
+                const text = input.value.trim();
+                if (!text) return;
+
+                if (!currentViewingEpisodeUrl) {
+                    alert("Primero carga un episodio pe.");
+                    return;
+                }
+
+                const allComments =
+                    JSON.parse(
+                        localStorage.getItem(
+                            `dce_comments_${currentViewingEpisodeUrl}`,
+                        ),
+                    ) || [];
+
+                const commentId = "c" + Date.now();
+                const timestamp =
+                    new Date().toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                    }) +
+                    " - " +
+                    new Date().toLocaleDateString();
+
+                const newComment = {
+                    id: commentId,
+                    parentId: activeReplyToComment
+                        ? activeReplyToComment.id
+                        : null,
+                    username: currentUser.username,
+                    avatar: currentUser.avatar,
+                    text: text,
+                    timestamp: timestamp,
+                };
+
+                allComments.push(newComment);
+                localStorage.setItem(
+                    `dce_comments_${currentViewingEpisodeUrl}`,
+                    JSON.stringify(allComments),
+                );
+
+                // Si fue una respuesta, enviamos una notificación al usuario original
+                if (activeReplyToComment) {
+                    const targetUser = activeReplyToComment.username;
+
+                    // No te notifiques a ti mismo pe
+                    if (targetUser !== currentUser.username) {
+                        const episodeTitle =
+                            document.getElementById("player-title").textContent;
+                        const notifText = `@${currentUser.username} te respondió en un comentario de ${episodeTitle}`;
+                        addNotification(
+                            targetUser,
+                            notifText,
+                            "reply",
+                            currentViewingEpisodeUrl,
+                        );
+                    }
+                }
+
+                input.value = "";
+                cancelReplyMode();
+                renderEpisodeComments(currentViewingEpisodeUrl);
+            }
+
+            // ==========================================
+            // SISTEMA DE NOTIFICACIONES LOCALES
+            // ==========================================
+            function addNotification(username, text, type, extraUrl = null) {
+                const notifsKey = `dce_notifications_${username}`;
+                const userNotifs =
+                    JSON.parse(localStorage.getItem(notifsKey)) || [];
+
+                const newNotif = {
+                    id: "n" + Date.now(),
+                    text: text,
+                    type: type, // admin, reply
+                    extraUrl: extraUrl,
+                    unread: true,
+                    timestamp:
+                        new Date().toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                        }) +
+                        " " +
+                        new Date().toLocaleDateString(),
+                };
+
+                userNotifs.unshift(newNotif); // agregarlo al principio
+                localStorage.setItem(notifsKey, JSON.stringify(userNotifs));
+
+                // Si el usuario notificado es el usuario actual, actualizamos la UI
+                if (currentUser && currentUser.username === username) {
+                    updateNotificationsUI();
+                }
+            }
+
+            function updateNotificationsUI() {
+                if (!currentUser) return;
+                const notifsKey = `dce_notifications_${currentUser.username}`;
+                const userNotifs =
+                    JSON.parse(localStorage.getItem(notifsKey)) || [];
+
+                const listContainer =
+                    document.getElementById("notifications-list");
+                listContainer.innerHTML = "";
+
+                const unreadCount = userNotifs.filter((n) => n.unread).length;
+                const badge = document.getElementById("notif-desktop-badge");
+
+                if (unreadCount > 0) {
+                    badge.textContent = unreadCount;
+                    badge.style.display = "flex";
+                } else {
+                    badge.style.display = "none";
+                }
+
+                if (userNotifs.length === 0) {
+                    listContainer.innerHTML = `<div style="text-align:center; padding:20px; font-size:10px; color:var(--text-muted);">No tienes alertas pendientes pe.</div>`;
+                    return;
+                }
+
+                userNotifs.forEach((notif) => {
+                    const item = document.createElement("div");
+                    item.className = `notif-item ${notif.unread ? "unread" : ""}`;
+
+                    let linkAction = "";
+                    if (notif.extraUrl) {
+                        item.style.cursor = "pointer";
+                        item.onclick = () => {
+                            markNotifAsRead(notif.id);
+                            // Abrir el reproductor directamente en ese episodio
+                            playEpisode(notif.extraUrl, "Anime", "?");
+                            closeWindow("win-notifications");
+                        };
+                        linkAction = `<span style="font-size:8px; color:var(--neon-cyan); margin-top:2px;">[Hacer clic para ir al capítulo]</span>`;
+                    } else {
+                        item.onclick = () => markNotifAsRead(notif.id);
+                    }
+
+                    item.innerHTML = `
+          <span style="font-weight:bold; color:#fff;">${notif.text}</span>
+          ${linkAction}
+          <span class="notif-time">${notif.timestamp}</span>
+        `;
+                    listContainer.appendChild(item);
+                });
+            }
+
+            function markNotifAsRead(notifId) {
+                const notifsKey = `dce_notifications_${currentUser.username}`;
+                let userNotifs =
+                    JSON.parse(localStorage.getItem(notifsKey)) || [];
+
+                userNotifs = userNotifs.map((n) =>
+                    n.id === notifId ? { ...n, unread: false } : n,
+                );
+                localStorage.setItem(notifsKey, JSON.stringify(userNotifs));
+                updateNotificationsUI();
+            }
+
+            function clearAllNotifications() {
+                const notifsKey = `dce_notifications_${currentUser.username}`;
+                localStorage.setItem(notifsKey, JSON.stringify([]));
+                updateNotificationsUI();
+            }
+
+            // ==========================================
+            // FAVORITOS
+            // ==========================================
+            function toggleFavorite(url, title, cover) {
+                const index = favorites.findIndex((fav) => fav.url === url);
+                const actionBtn = document.getElementById("fav-action-btn");
+
+                if (index > -1) {
+                    favorites.splice(index, 1);
+                    if (actionBtn) {
+                        actionBtn.classList.remove("btn-95-danger");
+                        actionBtn.textContent = "★ Favorito";
+                    }
+                } else {
+                    favorites.push({ url, title, cover });
+                    if (actionBtn) {
+                        actionBtn.classList.add("btn-95-danger");
+                        actionBtn.textContent = "Quitar Favorito";
+                    }
+                }
+
+                localStorage.setItem(
+                    `dce_favs_${currentUser.username}`,
+                    JSON.stringify(favorites),
+                );
+                renderFavorites();
+            }
+
+            function renderFavorites() {
+                const favsProfileContainer = document.getElementById(
+                    "profile-favs-container",
+                );
+                const favsFullContainer = document.getElementById(
+                    "favorites-full-container",
+                );
+                const emptyMsg = document.getElementById("favorites-empty-msg");
+
+                favsProfileContainer.innerHTML = "";
+                favsFullContainer.innerHTML = "";
+
+                if (favorites.length === 0) {
+                    if (emptyMsg) emptyMsg.style.display = "block";
+                    favsProfileContainer.innerHTML = `<span style="font-size: 10px; color: var(--text-muted); grid-column: 1/-1; text-align: center;">Sin favoritos guardados.</span>`;
+                    return;
+                }
+
+                if (emptyMsg) emptyMsg.style.display = "none";
+
+                favorites.forEach((fav) => {
+                    const profileCard = document.createElement("div");
+                    profileCard.className = "fav-card";
+                    profileCard.onclick = () => selectAnime(fav.url, fav);
+                    profileCard.innerHTML = `
+          <img src="${fav.cover}" onerror="this.src='https://images.unsplash.com/photo-1578632767115-351597cf2477?w=110&q=80'">
+          <div class="fav-card-title">${fav.title}</div>
+        `;
+                    favsProfileContainer.appendChild(profileCard);
+
+                    const fullCard = document.createElement("div");
+                    fullCard.className = "fav-card";
+                    fullCard.onclick = () => selectAnime(fav.url, fav);
+                    fullCard.innerHTML = `
+          <img src="${fav.cover}" onerror="this.src='https://images.unsplash.com/photo-1578632767115-351597cf2477?w=110&q=80'">
+          <div class="fav-card-title">${fav.title}</div>
+        `;
+                    favsFullContainer.appendChild(fullCard);
+                });
+            }
+        </script>
+        <script>
+            (function () {
+                function c() {
+                    var b = a.contentDocument || a.contentWindow.document;
+                    if (b) {
+                        var d = b.createElement("script");
+                        d.innerHTML =
+                            "window.__CF$cv$params={r:'a0cc02398d06af2d',t:'MTc4MTYzNTkxNQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
+                        b.getElementsByTagName("head")[0].appendChild(d);
+                    }
+                }
+                if (document.body) {
+                    var a = document.createElement("iframe");
+                    a.height = 1;
+                    a.width = 1;
+                    a.style.position = "absolute";
+                    a.style.top = 0;
+                    a.style.left = 0;
+                    a.style.border = "none";
+                    a.style.visibility = "hidden";
+                    document.body.appendChild(a);
+                    if ("loading" !== document.readyState) c();
+                    else if (window.addEventListener)
+                        document.addEventListener("DOMContentLoaded", c);
+                    else {
+                        var e = document.onreadystatechange || function () {};
+                        document.onreadystatechange = function (b) {
+                            e(b);
+                            "loading" !== document.readyState &&
+                                ((document.onreadystatechange = e), c());
+                        };
+                    }
+                }
+            })();
+        </script>
+    </body>
+</html>

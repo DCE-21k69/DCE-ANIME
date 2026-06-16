@@ -1,0 +1,14 @@
+{
+  "name": "dce-anime",
+  "version": "1.0.0",
+  "description": "Una web de anime retro Windows 95 con estilo Neon para visualizar streaming con Anime1v API",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  },
+  "author": "DCE",
+  "license": "MIT"
+}
