@@ -999,6 +999,111 @@
       margin-bottom: 10px;
     }
 
+    /* REDIMENSIONAMIENTO Y CONTROL DE VENTANAS */
+    .win-resize-handle {
+      position: absolute;
+      background: transparent;
+      user-select: none;
+    }
+    .win-resize-handle.r-handle:hover {
+      background: rgba(0, 240, 255, 0.15);
+    }
+    .win-resize-handle.b-handle:hover {
+      background: rgba(0, 240, 255, 0.15);
+    }
+    .win-resize-handle.se-handle:hover {
+      background: rgba(0, 240, 255, 0.3);
+    }
+    
+    body.theme-terminal .win-resize-handle.r-handle:hover,
+    body.theme-terminal .win-resize-handle.b-handle:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .window.maximized {
+      transform: none !important;
+      transition: none !important;
+    }
+
+    /* ADAPTACIÓN MÓVIL BRUTAL (RESPONSIVE RETRO OS) */
+    @media (max-width: 768px) {
+      /* Fondo móvil */
+      .desktop-bg {
+        background-image: url('./fondo2.png') !important;
+        background-size: cover !important;
+        background-position: center !important;
+      }
+
+      /* Ventanas full screen en móviles */
+      .window {
+        width: 100% !important;
+        height: calc(100% - 40px) !important;
+        top: 0px !important;
+        left: 0px !important;
+        transform: none !important;
+        box-shadow: none !important;
+        border: 2px solid var(--neon-cyan) !important;
+      }
+
+      /* Desactivar handles en móviles */
+      .win-resize-handle {
+        display: none !important;
+      }
+
+      .window-titlebar {
+        cursor: default !important;
+      }
+
+      /* Reordenamiento de íconos en móvil */
+      .desktop-icons {
+        flex-direction: row !important;
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+        width: 100% !important;
+        left: 0 !important;
+        top: 15px !important;
+        gap: 15px !important;
+        padding: 0 10px;
+      }
+
+      .desktop-icon {
+        width: 75px !important;
+      }
+
+      .desktop-icon svg {
+        width: 36px !important;
+        height: 36px !important;
+      }
+
+      .desktop-icon-label {
+        font-size: 10px !important;
+      }
+
+      /* Ajustes para ventanas en móvil */
+      .anime-detail-container {
+        flex-direction: column !important;
+        gap: 10px !important;
+      }
+
+      .anime-detail-left {
+        width: 100% !important;
+        text-align: center !important;
+      }
+
+      .anime-detail-left img {
+        width: 110px !important;
+      }
+
+      .results-grid {
+        max-height: 250px !important;
+      }
+
+      /* Quitar botón de maximizar en móviles */
+      .maximize-btn {
+        display: none !important;
+      }
+    }
+
   </style>
 </head>
 <body class="theme-neon">
@@ -1054,6 +1159,7 @@
         </div>
         <div class="window-controls">
           <button class="win-btn" onclick="minimizeWindow('win-search')">_</button>
+          <button class="win-btn maximize-btn" onclick="toggleMaximizeWindow('win-search')">🗖</button>
           <button class="win-btn close-btn" onclick="closeWindow('win-search')">X</button>
         </div>
       </div>
@@ -1089,6 +1195,7 @@
         </div>
         <div class="window-controls">
           <button class="win-btn" onclick="minimizeWindow('win-details')">_</button>
+          <button class="win-btn maximize-btn" onclick="toggleMaximizeWindow('win-details')">🗖</button>
           <button class="win-btn close-btn" onclick="closeWindow('win-details')">X</button>
         </div>
       </div>
@@ -1110,6 +1217,7 @@
         </div>
         <div class="window-controls">
           <button class="win-btn" onclick="minimizeWindow('win-player')">_</button>
+          <button class="win-btn maximize-btn" onclick="toggleMaximizeWindow('win-player')">🗖</button>
           <button class="win-btn close-btn" onclick="closeWindow('win-player')">X</button>
         </div>
       </div>
@@ -1174,6 +1282,7 @@
         </div>
         <div class="window-controls">
           <button class="win-btn" onclick="minimizeWindow('win-profile')">_</button>
+          <button class="win-btn maximize-btn" onclick="toggleMaximizeWindow('win-profile')">🗖</button>
           <button class="win-btn close-btn" onclick="closeWindow('win-profile')">X</button>
         </div>
       </div>
@@ -1212,6 +1321,7 @@
         </div>
         <div class="window-controls">
           <button class="win-btn" onclick="minimizeWindow('win-favorites')">_</button>
+          <button class="win-btn maximize-btn" onclick="toggleMaximizeWindow('win-favorites')">🗖</button>
           <button class="win-btn close-btn" onclick="closeWindow('win-favorites')">X</button>
         </div>
       </div>
@@ -1235,6 +1345,7 @@
         </div>
         <div class="window-controls">
           <button class="win-btn" onclick="minimizeWindow('win-api-settings')">_</button>
+          <button class="win-btn maximize-btn" onclick="toggleMaximizeWindow('win-api-settings')">🗖</button>
           <button class="win-btn close-btn" onclick="closeWindow('win-api-settings')">X</button>
         </div>
       </div>
@@ -1271,6 +1382,7 @@
         </div>
         <div class="window-controls">
           <button class="win-btn" onclick="minimizeWindow('win-design-settings')">_</button>
+          <button class="win-btn maximize-btn" onclick="toggleMaximizeWindow('win-design-settings')">🗖</button>
           <button class="win-btn close-btn" onclick="closeWindow('win-design-settings')">X</button>
         </div>
       </div>
@@ -1286,7 +1398,8 @@
         <div style="border-top: 1px dashed var(--neon-pink); padding-top: 10px;">
           <label style="display: block; font-size: 10px; color: var(--neon-cyan); margin-bottom: 4px;">FONDO DE PANTALLA (WALLPAPER DE TU CUENTA):</label>
           <div style="display: flex; flex-direction: column; gap: 8px;">
-            <button class="btn-95" onclick="setPresetWallpaper('grid')">Cuadrícula Neón (Default)</button>
+            <button class="btn-95" onclick="setPresetWallpaper('./fondo.jpg')">Fondo Saber (Default)</button>
+            <button class="btn-95" onclick="setPresetWallpaper('grid')">Cuadrícula Neón</button>
             <button class="btn-95" onclick="setPresetWallpaper('black')">Negro Absoluto</button>
             <div style="display: flex; gap: 5px;">
               <input type="text" id="wallpaper-url-input" class="input-95" placeholder="Pega el URL de una imagen">
@@ -1314,6 +1427,7 @@
         </div>
         <div class="window-controls">
           <button class="win-btn" onclick="minimizeWindow('win-notifications')">_</button>
+          <button class="win-btn maximize-btn" onclick="toggleMaximizeWindow('win-notifications')">🗖</button>
           <button class="win-btn close-btn" onclick="closeWindow('win-notifications')">X</button>
         </div>
       </div>
@@ -1625,6 +1739,7 @@
       updateClock();
       setInterval(updateClock, 1000);
       makeWindowsDraggable();
+      makeWindowsResizable();
     };
 
     function migrateCommentsAndLocalData() {
@@ -1842,7 +1957,7 @@
     // PERSONALIZACIÓN: WALLPAPERS LIGADOS A LA CUENTA
     // ==========================================
     function loadUserVisualSettings() {
-      const defaultVisual = { theme: "neon", wallpaper: "grid" };
+      const defaultVisual = { theme: "neon", wallpaper: "./fondo.jpg" };
       const savedVisual = localStorage.getItem(`dce_visual_settings_${currentUser.username}`);
       const settings = savedVisual ? JSON.parse(savedVisual) : defaultVisual;
       
@@ -1856,7 +1971,7 @@
 
     function getUserVisualSettingsObj() {
       const saved = localStorage.getItem(`dce_visual_settings_${currentUser.username}`);
-      return saved ? JSON.parse(saved) : { theme: "neon", wallpaper: "grid" };
+      return saved ? JSON.parse(saved) : { theme: "neon", wallpaper: "./fondo.jpg" };
     }
 
     function changeVisualTheme() {
@@ -1972,9 +2087,33 @@
       const win = document.getElementById(winId);
       if (!win) return;
 
+      // Posicionamiento equitativo side-by-side en desktop (como en la captura del usuario)
+      if (window.innerWidth > 768) {
+        if (winId === 'win-search') {
+          win.style.top = '2%';
+          win.style.left = '2%';
+          win.style.width = '46%';
+          win.style.height = '50%';
+        } else if (winId === 'win-details') {
+          win.style.top = '54%';
+          win.style.left = '2%';
+          win.style.width = '46%';
+          win.style.height = '42%';
+        } else if (winId === 'win-player') {
+          win.style.top = '2%';
+          win.style.left = '49%';
+          win.style.width = '49%';
+          win.style.height = '94%';
+        } else if (!activeWindows.includes(winId)) {
+          // Otras ventanas se abren en cascada tradicional
+          win.style.top = `${15 + (activeWindows.length * 4)}%`;
+          win.style.left = `${20 + (activeWindows.length * 4)}%`;
+          win.style.width = '';
+          win.style.height = '';
+        }
+      }
+
       if (!activeWindows.includes(winId)) {
-        win.style.top = `${10 + (activeWindows.length * 4)}%`;
-        win.style.left = `${15 + (activeWindows.length * 4)}%`;
         activeWindows.push(winId);
       }
 
@@ -2068,6 +2207,7 @@
         titlebar.onmousedown = dragMouseDown;
 
         function dragMouseDown(e) {
+          if (win.classList.contains("maximized")) return; // Desactivar arrastre si está maximizada pe!
           e = e || window.event;
           focusWindow(win.id);
           if (e.target.classList.contains("win-btn")) return;
@@ -2101,6 +2241,116 @@
           document.onmousemove = null;
         }
       });
+    }
+
+    function toggleMaximizeWindow(winId) {
+      if (window.innerWidth <= 768) return; // En móviles ya están maximizadas por CSS
+      const win = document.getElementById(winId);
+      if (!win) return;
+
+      if (win.classList.contains("maximized")) {
+        // Restaurar tamaño original
+        win.style.top = win.getAttribute("data-prev-top") || "15%";
+        win.style.left = win.getAttribute("data-prev-left") || "20%";
+        win.style.width = win.getAttribute("data-prev-width") || "500px";
+        win.style.height = win.getAttribute("data-prev-height") || "400px";
+        win.classList.remove("maximized");
+        win.querySelector(".maximize-btn").textContent = "🗖";
+      } else {
+        // Guardar coordenadas previas
+        win.setAttribute("data-prev-top", win.style.top);
+        win.setAttribute("data-prev-left", win.style.left);
+        win.setAttribute("data-prev-width", win.style.width || win.offsetWidth + "px");
+        win.setAttribute("data-prev-height", win.style.height || win.offsetHeight + "px");
+
+        // Maximizar al escritorio
+        win.style.top = "0px";
+        win.style.left = "0px";
+        win.style.width = "100%";
+        win.style.height = "calc(100% - 40px)";
+        win.classList.add("maximized");
+        win.querySelector(".maximize-btn").textContent = "🗗";
+      }
+    }
+
+    function makeWindowsResizable() {
+      if (window.innerWidth <= 768) return; // Desactivar redimensionamiento en móviles
+      const windows = document.querySelectorAll(".window");
+      windows.forEach(win => {
+        if (win.querySelector(".win-resize-handle")) return; // No duplicar handles
+
+        // Crear handle derecho
+        const rHandle = document.createElement("div");
+        rHandle.className = "win-resize-handle r-handle";
+        rHandle.style.position = "absolute";
+        rHandle.style.right = "-3px";
+        rHandle.style.top = "0";
+        rHandle.style.width = "6px";
+        rHandle.style.height = "100%";
+        rHandle.style.cursor = "e-resize";
+        rHandle.style.zIndex = "100";
+        win.appendChild(rHandle);
+
+        // Crear handle inferior
+        const bHandle = document.createElement("div");
+        bHandle.className = "win-resize-handle b-handle";
+        bHandle.style.position = "absolute";
+        bHandle.style.left = "0";
+        bHandle.style.bottom = "-3px";
+        bHandle.style.width = "100%";
+        bHandle.style.height = "6px";
+        bHandle.style.cursor = "s-resize";
+        bHandle.style.zIndex = "100";
+        win.appendChild(bHandle);
+
+        // Crear handle esquina inferior-derecha
+        const seHandle = document.createElement("div");
+        seHandle.className = "win-resize-handle se-handle";
+        seHandle.style.position = "absolute";
+        seHandle.style.right = "-3px";
+        seHandle.style.bottom = "-3px";
+        seHandle.style.width = "12px";
+        seHandle.style.height = "12px";
+        seHandle.style.cursor = "se-resize";
+        seHandle.style.zIndex = "101";
+        win.appendChild(seHandle);
+
+        // Eventos
+        rHandle.onmousedown = (e) => initResize(e, win, "r");
+        bHandle.onmousedown = (e) => initResize(e, win, "b");
+        seHandle.onmousedown = (e) => initResize(e, win, "se");
+      });
+    }
+
+    function initResize(e, win, direction) {
+      if (win.classList.contains("maximized")) return;
+      e.preventDefault();
+      e.stopPropagation();
+
+      const startWidth = win.offsetWidth;
+      const startHeight = win.offsetHeight;
+      const startX = e.clientX;
+      const startY = e.clientY;
+
+      document.onmousemove = (e) => {
+        if (direction === "r" || direction === "se") {
+          const newWidth = startWidth + (e.clientX - startX);
+          if (newWidth > 250) {
+            win.style.width = newWidth + "px";
+          }
+        }
+        if (direction === "b" || direction === "se") {
+          const newHeight = startHeight + (e.clientY - startY);
+          if (newHeight > 150) {
+            win.style.height = newHeight + "px";
+          }
+        }
+      };
+
+      document.onmouseup = () => {
+        document.onmousemove = null;
+        document.onmouseup = null;
+      };
     }
 
     // ==========================================
