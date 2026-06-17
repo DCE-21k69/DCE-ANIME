@@ -1193,13 +1193,31 @@
     }
     
     @media (max-width: 768px) {
-      /* Ocultar en móviles para que no estorbe */
+      /* Ajuste del carrusel para móviles: en el medio, sin tapar iconos superiores */
       .desktop-carousel-widget {
-        display: none !important;
+        display: flex !important;
+        position: absolute !important;
+        top: 150px !important; /* Situado en el medio, debajo de la fila de iconos */
+        left: 12px !important;
+        right: 12px !important;
+        height: 180px !important;
+        background: rgba(0, 0, 0, 0.3) !important;
+        backdrop-filter: blur(3px) !important;
+        border: none !important;
+        padding: 8px !important;
       }
-      /* Ocultar mascota en móvil */
-      #desktop-pet {
-        display: none !important;
+
+      .carousel-card {
+        width: 80px !important; /* Tarjetas más compactas en móviles */
+        padding: 4px !important;
+      }
+
+      .carousel-card img {
+        height: 90px !important; /* Portada más baja en pantallas chicas */
+      }
+
+      .carousel-card-title {
+        font-size: 8px !important;
       }
     }
 
