@@ -1105,10 +1105,10 @@
     /* ESTILOS DEL CARRUSEL DE TENDENCIAS EN EL ESCRITORIO */
     .desktop-carousel-widget {
       position: absolute;
-      top: 8%; /* Más arriba para no dejar espacios vacíos, pe! */
+      top: 15px; /* Al tope de la pantalla, alineado con los iconos del escritorio! */
       left: 140px;
       right: 40px;
-      height: 240px;
+      height: 220px;
       background: rgba(0, 0, 0, 0.2); /* Súper transparente estilo Windows 7 Aero minimalista */
       backdrop-filter: blur(4px); /* Cristal blur sutil */
       border: none; /* Eliminado el contorno para un look ultra limpio */
@@ -1147,14 +1147,13 @@
       flex-grow: 1;
       padding-bottom: 5px;
       scroll-behavior: smooth;
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none; /* IE y Edge */
     }
 
     /* Ocultar barra de scroll estándar en el carrusel para que sea más limpio */
     .carousel-track::-webkit-scrollbar {
-      height: 4px;
-    }
-    .carousel-track::-webkit-scrollbar-thumb {
-      background: var(--neon-pink);
+      display: none; /* Ocultada por completo pe! */
     }
 
     .carousel-card {
@@ -2049,6 +2048,25 @@
       const track = document.getElementById("carousel-track-el");
       if (track) {
         track.scrollLeft += event.deltaY * 1.5;
+        checkInfiniteCarouselScroll();
+      }
+    }
+
+    function checkInfiniteCarouselScroll() {
+      const track = document.getElementById("carousel-track-el");
+      if (!track) return;
+
+      // Si el usuario está a menos de 400px de llegar al final del carrusel, clonamos todas las tarjetas actuales y las volvemos a poner para hacerlo INFINITO
+      if (track.scrollLeft + track.clientWidth >= track.scrollWidth - 400) {
+        const cards = Array.from(track.children);
+        if (cards.length === 0) return;
+
+        cards.forEach(card => {
+          const clone = card.cloneNode(true);
+          // Volver a enlazar la acción de clic para ver la ficha del anime
+          clone.onclick = card.onclick;
+          track.appendChild(clone);
+        });
       }
     }
 
