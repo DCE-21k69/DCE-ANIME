@@ -1105,14 +1105,14 @@
     /* ESTILOS DEL CARRUSEL DE TENDENCIAS EN EL ESCRITORIO */
     .desktop-carousel-widget {
       position: absolute;
-      top: 15%;
+      top: 8%; /* Más arriba para no dejar espacios vacíos, pe! */
       left: 140px;
       right: 40px;
-      height: 230px;
-      background: rgba(26, 15, 48, 0.4);
-      backdrop-filter: blur(5px);
-      border: 1px dashed var(--neon-cyan);
-      box-shadow: 0 0 10px rgba(0, 240, 255, 0.1);
+      height: 240px;
+      background: rgba(0, 0, 0, 0.2); /* Súper transparente estilo Windows 7 Aero minimalista */
+      backdrop-filter: blur(4px); /* Cristal blur sutil */
+      border: none; /* Eliminado el contorno para un look ultra limpio */
+      box-shadow: none; /* Sin sombras pesadas */
       padding: 12px;
       z-index: 2; /* Por detrás de las ventanas que tienen z-index 100+ */
       display: flex;
@@ -1122,8 +1122,8 @@
     }
 
     body.theme-terminal .desktop-carousel-widget {
-      background: rgba(0, 0, 0, 0.6);
-      border: 1px dashed #ffffff;
+      background: rgba(0, 0, 0, 0.4);
+      border: none;
       box-shadow: none;
     }
 
@@ -1132,7 +1132,7 @@
       font-weight: bold;
       color: var(--neon-cyan);
       text-shadow: 0 0 4px var(--neon-cyan);
-      border-bottom: 1px dashed var(--neon-pink);
+      border-bottom: none; /* Eliminada la línea divisoria para minimalismo */
       padding-bottom: 4px;
       display: flex;
       align-items: center;
@@ -1160,8 +1160,8 @@
     .carousel-card {
       width: 100px;
       flex-shrink: 0;
-      background: rgba(17, 8, 38, 0.7);
-      border: 1px solid var(--neon-pink);
+      background: rgba(10, 5, 22, 0.4); /* Tarjetas semi-transparentes estilo aero */
+      border: 1px solid rgba(255, 0, 127, 0.25); /* Contorno rosa ultra sutil y elegante */
       padding: 6px;
       cursor: pointer;
       display: flex;
