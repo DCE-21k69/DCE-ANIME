@@ -675,8 +675,6 @@
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
       gap: 12px;
-      max-height: 350px;
-      overflow-y: auto;
     }
 
     .anime-card {
@@ -758,7 +756,7 @@
 
     .episode-list {
       margin-top: 10px;
-      max-height: 180px;
+      max-height: 350px;
       overflow-y: auto;
       border: 1px solid var(--neon-pink);
       background: #090312;
@@ -839,7 +837,7 @@
     }
 
     .comments-list {
-      max-height: 250px;
+      max-height: 400px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
@@ -1151,7 +1149,7 @@
     <!-- ========================================== -->
     <!-- WINDOW 1: BUSCADOR DE ANIME                -->
     <!-- ========================================== -->
-    <div class="window" id="win-search" style="top: 8%; left: 15%; width: 620px; max-width: 90%;">
+    <div class="window" id="win-search" style="top: 8%; left: 15%; width: 620px;">
       <div class="window-titlebar">
         <div class="window-title">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -1187,7 +1185,7 @@
     <!-- ========================================== -->
     <!-- WINDOW 2: INFO / DETALLES ANIME            -->
     <!-- ========================================== -->
-    <div class="window" id="win-details" style="top: 15%; left: 20%; width: 550px; max-width: 90%;">
+    <div class="window" id="win-details" style="top: 15%; left: 20%; width: 550px;">
       <div class="window-titlebar">
         <div class="window-title">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
@@ -1209,7 +1207,7 @@
     <!-- ========================================== -->
     <!-- WINDOW 3: REPRODUCTOR DE EPISODIOS          -->
     <!-- ========================================== -->
-    <div class="window" id="win-player" style="top: 5%; left: 30%; width: 620px; max-width: 95%;">
+    <div class="window" id="win-player" style="top: 5%; left: 30%; width: 620px;">
       <div class="window-titlebar">
         <div class="window-title">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
@@ -1274,7 +1272,7 @@
     <!-- ========================================== -->
     <!-- WINDOW 4: MI PERFIL                        -->
     <!-- ========================================== -->
-    <div class="window" id="win-profile" style="top: 22%; left: 10%; width: 450px; max-width: 90%;">
+    <div class="window" id="win-profile" style="top: 22%; left: 10%; width: 450px;">
       <div class="window-titlebar">
         <div class="window-title">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -1313,7 +1311,7 @@
     <!-- ========================================== -->
     <!-- WINDOW 5: FAVORITOS                         -->
     <!-- ========================================== -->
-    <div class="window" id="win-favorites" style="top: 20%; left: 35%; width: 480px; max-width: 90%;">
+    <div class="window" id="win-favorites" style="top: 20%; left: 35%; width: 480px;">
       <div class="window-titlebar">
         <div class="window-title">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
@@ -1338,7 +1336,7 @@
     <!-- ========================================== -->
     <!-- WINDOW 6: AJUSTES API                      -->
     <!-- ========================================== -->
-    <div class="window" id="win-api-settings" style="top: 30%; left: 45%; width: 400px; max-width: 90%;">
+    <div class="window" id="win-api-settings" style="top: 30%; left: 45%; width: 400px;">
       <div class="window-titlebar">
         <div class="window-title">
           Ajustes de la API de Anime
@@ -1375,7 +1373,7 @@
     <!-- ========================================== -->
     <!-- WINDOW 7: AJUSTES DE DISEÑO / FONDO / TEMA -->
     <!-- ========================================== -->
-    <div class="window" id="win-design-settings" style="top: 25%; left: 30%; width: 420px; max-width: 90%;">
+    <div class="window" id="win-design-settings" style="top: 25%; left: 30%; width: 420px;">
       <div class="window-titlebar">
         <div class="window-title">
           Personalizar Pantalla & Tema
@@ -1419,7 +1417,7 @@
     <!-- ========================================== -->
     <!-- WINDOW 8: NOTIFICACIONES                   -->
     <!-- ========================================== -->
-    <div class="window" id="win-notifications" style="top: 25%; left: 35%; width: 450px; max-width: 90%;">
+    <div class="window" id="win-notifications" style="top: 25%; left: 35%; width: 450px;">
       <div class="window-titlebar">
         <div class="window-title">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
@@ -2091,23 +2089,23 @@
       if (window.innerWidth > 768) {
         if (winId === 'win-search') {
           win.style.top = '2%';
-          win.style.left = '2%';
-          win.style.width = '46%';
+          win.style.left = '110px';
+          win.style.width = 'calc(45% - 55px)';
           win.style.height = '50%';
         } else if (winId === 'win-details') {
           win.style.top = '54%';
-          win.style.left = '2%';
-          win.style.width = '46%';
+          win.style.left = '110px';
+          win.style.width = 'calc(45% - 55px)';
           win.style.height = '42%';
         } else if (winId === 'win-player') {
           win.style.top = '2%';
-          win.style.left = '49%';
-          win.style.width = '49%';
+          win.style.left = '47%';
+          win.style.width = '52%';
           win.style.height = '94%';
         } else if (!activeWindows.includes(winId)) {
-          // Otras ventanas se abren en cascada tradicional
+          // Otras ventanas se abren en cascada tradicional, evitando tapar iconos de la izquierda
           win.style.top = `${15 + (activeWindows.length * 4)}%`;
-          win.style.left = `${20 + (activeWindows.length * 4)}%`;
+          win.style.left = `${130 + (activeWindows.length * 4)}px`;
           win.style.width = '';
           win.style.height = '';
         }
