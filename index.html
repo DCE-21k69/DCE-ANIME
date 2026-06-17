@@ -2139,12 +2139,29 @@
     }
 
     function stopVideoPlayer() {
-      const frame = document.getElementById("video-frame");
-      const placeholder = document.getElementById("player-placeholder-el");
-      if (frame) {
-        frame.src = "about:blank";
-        frame.style.display = "none";
+      const playerContainer = document.querySelector(".player-container");
+      if (playerContainer) {
+        // Borramos el iframe viejo del DOM para matar el audio de raíz!
+        const oldFrame = document.getElementById("video-frame");
+        if (oldFrame) {
+          oldFrame.src = "about:blank"; 
+          oldFrame.remove(); 
+        }
+
+        // Creamos un nuevo iframe completamente limpio
+        const newFrame = document.createElement("iframe");
+        newFrame.id = "video-frame";
+        newFrame.style.width = "100%";
+        newFrame.style.height = "100%";
+        newFrame.style.border = "none";
+        newFrame.style.display = "none";
+        newFrame.setAttribute("allowfullscreen", "true");
+        
+        playerContainer.insertBefore(newFrame, playerContainer.firstChild);
       }
+
+      // Limpiamos también el placeholder
+      const placeholder = document.getElementById("player-placeholder-el");
       if (placeholder) {
         placeholder.style.display = "flex";
         placeholder.innerHTML = `
