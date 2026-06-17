@@ -1102,6 +1102,104 @@
       }
     }
 
+    /* ESTILOS DEL CARRUSEL DE TENDENCIAS EN EL ESCRITORIO */
+    .desktop-carousel-widget {
+      position: absolute;
+      top: 15%;
+      left: 140px;
+      right: 40px;
+      height: 230px;
+      background: rgba(26, 15, 48, 0.4);
+      backdrop-filter: blur(5px);
+      border: 1px dashed var(--neon-cyan);
+      box-shadow: 0 0 10px rgba(0, 240, 255, 0.1);
+      padding: 12px;
+      z-index: 2; /* Por detrás de las ventanas que tienen z-index 100+ */
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow: hidden;
+    }
+
+    body.theme-terminal .desktop-carousel-widget {
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px dashed #ffffff;
+      box-shadow: none;
+    }
+
+    .carousel-title {
+      font-size: 11px;
+      font-weight: bold;
+      color: var(--neon-cyan);
+      text-shadow: 0 0 4px var(--neon-cyan);
+      border-bottom: 1px dashed var(--neon-pink);
+      padding-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .carousel-track {
+      display: flex;
+      gap: 15px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      flex-grow: 1;
+      padding-bottom: 5px;
+      scroll-behavior: smooth;
+    }
+
+    /* Ocultar barra de scroll estándar en el carrusel para que sea más limpio */
+    .carousel-track::-webkit-scrollbar {
+      height: 4px;
+    }
+    .carousel-track::-webkit-scrollbar-thumb {
+      background: var(--neon-pink);
+    }
+
+    .carousel-card {
+      width: 100px;
+      flex-shrink: 0;
+      background: rgba(17, 8, 38, 0.7);
+      border: 1px solid var(--neon-pink);
+      padding: 6px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      transition: transform 0.15s ease, border-color 0.15s ease;
+    }
+
+    .carousel-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 8px var(--neon-cyan);
+    }
+
+    .carousel-card img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      border: 1px solid #331550;
+    }
+
+    .carousel-card-title {
+      font-size: 9px;
+      font-weight: bold;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: #fff;
+    }
+    
+    @media (max-width: 768px) {
+      /* Ocultar en móviles para que no estorbe */
+      .desktop-carousel-widget {
+        display: none !important;
+      }
+    }
+
   </style>
 </head>
 <body class="theme-neon">
@@ -1143,6 +1241,19 @@
         </svg>
         <span class="desktop-icon-label">Notificaciones</span>
         <div class="notification-badge" id="notif-desktop-badge" style="display: none;">0</div>
+      </div>
+    </div>
+
+    <!-- WIDGET CARRUSEL DE TENDENCIAS EN EL ESCRITORIO -->
+    <div class="desktop-carousel-widget" id="desktop-carousel" style="display: none;">
+      <h3 class="carousel-title">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="filter: drop-shadow(0 0 3px var(--neon-cyan));">
+          <polygon points="6 3 20 12 6 21 6 3" fill="var(--neon-cyan)"/>
+        </svg>
+        <span>TENDENCIAS GLOBALES EN DCE-NET</span>
+      </h3>
+      <div class="carousel-track" id="carousel-track-el" onwheel="handleCarouselWheel(event)">
+        <!-- Se cargará dinámicamente -->
       </div>
     </div>
 
@@ -1899,6 +2010,10 @@
       favorites = [];
       document.getElementById("login-screen").style.display = "flex";
       
+      // Ocultar carrusel
+      const carousel = document.getElementById("desktop-carousel");
+      if (carousel) carousel.style.display = "none";
+
       // Cerrar todas las ventanas abiertas
       activeWindows.forEach(winId => {
         const win = document.getElementById(winId);
@@ -1924,8 +2039,81 @@
 
       renderFavorites();
       updateNotificationsUI();
-      openWindow("win-search");
-      executeSearch();
+      
+      // Cargar carrusel de tendencias en el escritorio
+      loadDesktopCarousel();
+    }
+
+    function handleCarouselWheel(event) {
+      event.preventDefault();
+      const track = document.getElementById("carousel-track-el");
+      if (track) {
+        track.scrollLeft += event.deltaY * 1.5;
+      }
+    }
+
+    async function loadDesktopCarousel() {
+      const widget = document.getElementById("desktop-carousel");
+      const track = document.getElementById("carousel-track-el");
+      if (!widget || !track) return;
+
+      widget.style.display = "flex";
+      track.innerHTML = `<div style="text-align: center; width: 100%; font-size: 10px; padding: 30px;" class="neon-text-cyan">Sincronizando catálogo en tiempo real...</div>`;
+
+      try {
+        let list = [];
+
+        if (apiSettings.mode === "real") {
+          // Buscamos catálogo real en la API
+          const data = await apiFetch(`/catalog?page=1&provider=animeav1`);
+          if (data && data.data && data.data.results) {
+            list = data.data.results.map(item => ({
+              title: item.title,
+              url: item.url,
+              cover: item.image || item.cover || "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=150&q=80"
+            }));
+          }
+        }
+
+        // Si la API falla, no devuelve nada, o estamos en modo demo: usamos los animes de respaldo
+        if (list.length === 0) {
+          await new Promise(resolve => setTimeout(resolve, 300));
+          list = [
+            ...DEMO_ANIME_DB,
+            {
+              title: "Jujutsu Kaisen S2",
+              url: "https://animeav1.com/media/jujutsu-kaisen-s2",
+              cover: "https://images.unsplash.com/photo-1541562232579-512a21360020?w=150&q=80"
+            },
+            {
+              title: "Solo Leveling",
+              url: "https://animeav1.com/media/solo-leveling",
+              cover: "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=150&q=80"
+            },
+            {
+              title: "Kaiju No. 8",
+              url: "https://animeav1.com/media/kaiju-no-8",
+              cover: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150&q=80"
+            }
+          ];
+        }
+
+        track.innerHTML = "";
+        list.forEach(anime => {
+          const card = document.createElement("div");
+          card.className = "carousel-card";
+          card.onclick = () => selectAnime(anime.url, anime);
+          card.innerHTML = `
+            <img src="${anime.cover}" onerror="this.src='https://images.unsplash.com/photo-1578632767115-351597cf2477?w=150&q=80'" alt="Cover">
+            <div class="carousel-card-title">${anime.title}</div>
+          `;
+          track.appendChild(card);
+        });
+
+      } catch (error) {
+        console.error("Error al cargar carrusel:", error);
+        track.innerHTML = `<div style="text-align: center; width: 100%; font-size: 10px; padding: 20px;" class="neon-text-pink">Error de conexión con la API en la nube.</div>`;
+      }
     }
 
     function uploadProfilePic(event) {
