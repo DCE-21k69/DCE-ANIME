@@ -1197,6 +1197,24 @@
       .desktop-carousel-widget {
         display: none !important;
       }
+      /* Ocultar mascota en móvil */
+      #desktop-pet {
+        display: none !important;
+      }
+    }
+
+    /* ANIMACIONES GATITO DESKTOP PET */
+    @keyframes cat-tail-wag {
+      0% { transform: rotate(-8deg); }
+      100% { transform: rotate(12deg); }
+    }
+    @keyframes pet-leg-swing-1 {
+      0% { transform: translateY(0px) rotate(-12deg); }
+      100% { transform: translateY(-1.5px) rotate(12deg); }
+    }
+    @keyframes pet-leg-swing-2 {
+      0% { transform: translateY(-1.5px) rotate(12deg); }
+      100% { transform: translateY(0px) rotate(-12deg); }
     }
 
   </style>
@@ -1556,6 +1574,36 @@
           <!-- Dinámico -->
         </div>
       </div>
+    </div>
+
+    <!-- MASCOTA VIRTUAL: GATITO PIXEL-ART -->
+    <div id="desktop-pet" style="display: none; position: absolute; bottom: 0px; left: 0px; width: 36px; height: 32px; z-index: 99; pointer-events: none; transition: transform 0.1s;">
+      <svg id="pet-svg" viewBox="0 0 32 32" width="36" height="32" style="display: block;">
+        <!-- Cola con animación -->
+        <rect x="2" y="14" width="4" height="6" fill="#ff9f43" id="pet-cat-tail" style="transform-origin: bottom right; animation: cat-tail-wag 0.4s infinite alternate ease-in-out;" />
+        
+        <!-- Cuerpo -->
+        <rect x="6" y="14" width="16" height="10" fill="#ff9f43" />
+        <rect x="8" y="16" width="12" height="6" fill="#f07d1e" /> <!-- Sombras lomo -->
+        
+        <!-- Cabeza -->
+        <rect x="14" y="8" width="10" height="10" fill="#ff9f43" />
+        <!-- Orejas -->
+        <polygon points="14,8 14,4 20,8" fill="#ff9f43" />
+        <polygon points="20,8 24,4 24,8" fill="#ff9f43" />
+        <!-- Ojos -->
+        <rect x="17" y="11" width="2" height="2" fill="#000" />
+        <rect x="21" y="11" width="2" height="2" fill="#000" />
+        <!-- Hocico -->
+        <rect x="19" y="13" width="2" height="1" fill="#fff" />
+        <rect x="20" y="14" width="1" height="1" fill="#ff4d4d" />
+        
+        <!-- Patitas (paws) animadas individualmente para simular caminata! -->
+        <rect x="8" y="24" width="2" height="4" fill="#ff9f43" id="pet-paw-1" style="transform-origin: top center; animation: pet-leg-swing-1 0.2s infinite alternate ease-in-out;" />
+        <rect x="11" y="24" width="2" height="4" fill="#ffffff" id="pet-paw-2" style="transform-origin: top center; animation: pet-leg-swing-2 0.2s infinite alternate ease-in-out;" />
+        <rect x="16" y="24" width="2" height="4" fill="#ff9f43" id="pet-paw-3" style="transform-origin: top center; animation: pet-leg-swing-1 0.2s infinite alternate ease-in-out;" />
+        <rect x="19" y="24" width="2" height="4" fill="#ffffff" id="pet-paw-4" style="transform-origin: top center; animation: pet-leg-swing-2 0.2s infinite alternate ease-in-out;" />
+      </svg>
     </div>
 
   </div>
@@ -2013,6 +2061,13 @@
       const carousel = document.getElementById("desktop-carousel");
       if (carousel) carousel.style.display = "none";
 
+      // Ocultar y detener gatito
+      const pet = document.getElementById("desktop-pet");
+      if (pet) pet.style.display = "none";
+      if (typeof petAnimationId !== 'undefined' && petAnimationId) {
+        cancelAnimationFrame(petAnimationId);
+      }
+
       // Cerrar todas las ventanas abiertas
       activeWindows.forEach(winId => {
         const win = document.getElementById(winId);
@@ -2041,6 +2096,44 @@
       
       // Cargar carrusel de tendencias en el escritorio
       loadDesktopCarousel();
+
+      // Iniciar mascota gatito en el escritorio
+      const pet = document.getElementById("desktop-pet");
+      if (pet) {
+        pet.style.display = "block";
+        animateDesktopPet();
+      }
+    }
+
+    // LÓGICA DEL GATITO ESCRITORIO
+    let catX = 0;
+    let catSpeed = 1.0; // Velocidad de caminata sutil y tierna
+    const catWidth = 36;
+    let petAnimationId = null;
+
+    function animateDesktopPet() {
+      const pet = document.getElementById("desktop-pet");
+      if (!pet || pet.style.display === "none") return;
+
+      catX += catSpeed;
+      
+      const maxW = window.innerWidth;
+      
+      // Si choca con el borde derecho, dar la vuelta
+      if (catX >= maxW - catWidth) {
+        catX = maxW - catWidth;
+        catSpeed = -Math.abs(catSpeed);
+        pet.style.transform = "scaleX(-1)"; // Voltear gatito horizontalmente
+      } 
+      // Si choca con el borde izquierdo, dar la vuelta
+      else if (catX <= 0) {
+        catX = 0;
+        catSpeed = Math.abs(catSpeed);
+        pet.style.transform = "scaleX(1)"; // Orientar al frente original (derecha)
+      }
+
+      pet.style.left = catX + "px";
+      petAnimationId = requestAnimationFrame(animateDesktopPet);
     }
 
     function handleCarouselWheel(event) {
