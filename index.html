@@ -1277,6 +1277,16 @@
         <span class="desktop-icon-label">Notificaciones</span>
         <div class="notification-badge" id="notif-desktop-badge" style="display: none;">0</div>
       </div>
+
+      <!-- ICONO INFORMACIÓN -->
+      <div class="desktop-icon" onclick="openWindow('win-info')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10" stroke="#00f0ff" />
+          <line x1="12" y1="16" x2="12" y2="12" stroke="#ff007f" />
+          <line x1="12" y1="8" x2="12.01" y2="8" stroke="#ff007f" stroke-width="2.5" />
+        </svg>
+        <span class="desktop-icon-label">Información</span>
+      </div>
     </div>
 
     <!-- WIDGET CARRUSEL DE TENDENCIAS EN EL ESCRITORIO -->
@@ -1590,6 +1600,47 @@
 
         <div id="notifications-list" style="max-height: 250px; overflow-y: auto;">
           <!-- Dinámico -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- WINDOW 9: INFORMACIÓN (DCE STUDIOS)         -->
+    <!-- ========================================== -->
+    <div class="window" id="win-info" style="top: 25%; left: 35%; width: 440px;">
+      <div class="window-titlebar">
+        <div class="window-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="16" x2="12" y2="12"/>
+            <line x1="12" y1="8" x2="12.01" y2="8"/>
+          </svg>
+          Acerca de DCE-ANIME
+        </div>
+        <div class="window-controls">
+          <button class="win-btn" onclick="minimizeWindow('win-info')">_</button>
+          <button class="win-btn maximize-btn" onclick="toggleMaximizeWindow('win-info')">🗖</button>
+          <button class="win-btn close-btn" onclick="closeWindow('win-info')">X</button>
+        </div>
+      </div>
+      <div class="window-body" style="text-align: center; display: flex; flex-direction: column; gap: 15px; padding: 20px;">
+        <h2 class="neon-text-pink" style="font-size: 20px; letter-spacing: 2px;">DCE-ANIME v1.3</h2>
+        <p style="font-size: 11px; color: #fff;">Un portal retro-futurista de libre accesibilidad para ver anime en tiempo real.</p>
+        
+        <div style="border: 1px dashed var(--neon-cyan); padding: 12px; background: rgba(0, 240, 255, 0.05); text-align: left; font-size: 11px; display: flex; flex-direction: column; gap: 8px;">
+          <div><span class="neon-text-cyan" style="font-weight: bold; text-shadow: 0 0 2px var(--neon-cyan);">PROPIETARIO / CORE OWNER:</span><br>Lettiori De la Corte Espinoza</div>
+          <div><span class="neon-text-pink" style="font-weight: bold; text-shadow: 0 0 2px var(--neon-pink);">DESARROLLADO POR / BRAND:</span><br>DCE STUDIOS</div>
+        </div>
+
+        <div style="margin-top: 5px;">
+          <p style="font-size: 10px; color: var(--text-muted); margin-bottom: 10px;">Conoce más de nuestros desarrollos de libre accesibilidad en:</p>
+          <a href="https://dcegaming.netlify.app/" target="_blank" class="btn-95" style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="filter: drop-shadow(0 0 2px var(--neon-cyan));">
+              <rect x="2" y="2" width="20" height="20" rx="2" fill="none"/>
+              <path d="M6 12h12M12 6v12" stroke="var(--neon-cyan)"/>
+            </svg>
+            DCE GAMING ➜
+          </a>
         </div>
       </div>
     </div>
@@ -2531,6 +2582,7 @@
         "win-favorites": "Favoritos",
         "win-design-settings": "Tema",
         "win-notifications": "Notif",
+        "win-info": "DCE Info",
         "win-api-settings": "Ajustes API"
       };
 
